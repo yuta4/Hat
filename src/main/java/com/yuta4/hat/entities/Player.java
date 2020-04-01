@@ -1,5 +1,6 @@
 package com.yuta4.hat.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,9 +23,11 @@ public class Player {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @ManyToOne
+    @JsonIgnore
     private Game lastGame;
 
 }

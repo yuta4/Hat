@@ -11,7 +11,7 @@ import com.yuta4.hat.services.TeamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,7 +32,7 @@ public class TeamController {
         this.gameService = gameService;
     }
 
-    @PutMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<String> createTeam(Principal principal, @RequestParam String playerEmails) {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());

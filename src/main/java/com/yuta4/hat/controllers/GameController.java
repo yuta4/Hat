@@ -10,7 +10,7 @@ import com.yuta4.hat.services.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -36,7 +36,7 @@ public class GameController {
         this.gameWordService = gameWordService;
     }
 
-    @PutMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<Long> startGame(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = player.getLastGame();
@@ -47,7 +47,7 @@ public class GameController {
         return ResponseEntity.ok().body(game.getId());
     }
 
-    @PutMapping("/finish")
+    @PostMapping("/finish")
     public ResponseEntity<Void> finishGame(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = player.getLastGame();
@@ -55,7 +55,7 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/generate/words")
+    @PostMapping("/generate/words")
     public ResponseEntity<String> generateWords(Principal principal, @RequestParam Integer wordsPerPlayer,
                                                 @RequestParam(required = false) List<Level> levels) {
         try {
@@ -78,7 +78,7 @@ public class GameController {
         }
     }
 
-    @PutMapping("/round/start")
+    @PostMapping("/round/start")
     public ResponseEntity<List<String>> startRound(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = player.getLastGame();
@@ -87,7 +87,7 @@ public class GameController {
         return ResponseEntity.ok(gameWordService.getNotGuessedWords(game));
     }
 
-    @PutMapping("/round/finish")
+    @PostMapping("/round/finish")
     public ResponseEntity<List<String>> finishRound(Principal principal, @RequestParam List<String> guessedWords) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         gameWordService.markAsGuessed(guessedWords, teamService.getPlayerTeam(player));

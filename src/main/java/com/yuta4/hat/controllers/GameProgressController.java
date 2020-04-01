@@ -11,7 +11,7 @@ import com.yuta4.hat.services.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
@@ -30,7 +30,7 @@ public class GameProgressController {
         this.playerService = playerService;
     }
 
-    @PutMapping("/next")
+    @PostMapping("/next")
     public ResponseEntity<String> nextProgress(Principal principal) {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());
@@ -43,7 +43,7 @@ public class GameProgressController {
         }
     }
 
-    @PutMapping("/previous")
+    @PostMapping("/previous")
     public ResponseEntity<String> previousProgress(Principal principal) {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());
