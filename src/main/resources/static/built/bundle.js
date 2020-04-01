@@ -34162,7 +34162,7 @@ var PlayerList = /*#__PURE__*/function (_React$Component2) {
     value: function render() {
       var players = this.props.players.map(function (player) {
         return /*#__PURE__*/React.createElement(Player, {
-          key: player.name,
+          key: player.email,
           data: player
         });
       });
@@ -34187,7 +34187,7 @@ var Player = /*#__PURE__*/function (_React$Component3) {
   _createClass(Player, [{
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.player.id), /*#__PURE__*/React.createElement("td", null, this.props.player.name), /*#__PURE__*/React.createElement("td", null, this.props.player.email));
+      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.data.id), /*#__PURE__*/React.createElement("td", null, this.props.data.name), /*#__PURE__*/React.createElement("td", null, this.props.data.email));
     }
   }]);
 

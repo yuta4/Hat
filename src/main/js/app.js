@@ -25,7 +25,7 @@ class App extends React.Component {
 class PlayerList extends React.Component{
     render() {
         const players = this.props.players.map(player =>
-            <Player key={player.name} data={player}/>
+            <Player key={player.email} data={player}/>
         );
         return (
             <table>
@@ -46,9 +46,9 @@ class Player extends React.Component{
     render() {
         return (
             <tr>
-                <td>{this.props.player.id}</td>
-                <td>{this.props.player.name}</td>
-                <td>{this.props.player.email}</td>
+                <td>{this.props.data.id}</td>
+                <td>{this.props.data.name}</td>
+                <td>{this.props.data.email}</td>
             </tr>
         )
     }
