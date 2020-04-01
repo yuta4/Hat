@@ -1,0 +1,7 @@
+http://localhost:8080/game/create
+
+http://localhost:8080/team/create?gameId=1&playerEmails=yura.berezin@gmail.com,gapchukirina@gmail.com
+http://localhost:8080/team/create?gameId=1&playerEmails=dimka@gmail.com,anna@gmail.com
+
+http://localhost:8080/game/generate/words?gameId=1&wordsPerPlayer=2&levels=EASY&levels=MIDDLE
+http://localhost:8080/game/generate/words?gameId=2&wordsPerPlayer=2&levels=EASY&levels=MIDDLE
