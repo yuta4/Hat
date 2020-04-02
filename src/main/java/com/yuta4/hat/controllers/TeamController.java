@@ -1,10 +1,9 @@
 package com.yuta4.hat.controllers;
 
-import com.yuta4.hat.exceptionas.TeamException;
-import com.yuta4.hat.exceptionas.NoSuchGameException;
-import com.yuta4.hat.exceptionas.NoSuchPlayerException;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
+import com.yuta4.hat.exceptionas.NoSuchPlayerException;
+import com.yuta4.hat.exceptionas.TeamException;
 import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.PlayerService;
 import com.yuta4.hat.services.TeamService;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/team")
@@ -37,7 +36,7 @@ public class TeamController {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());
             Game game = player.getLastGame();
-            List<Player> players = playerService.getPLayersList(playerEmails);
+            Set<Player> players = playerService.getPLayersList(playerEmails);
             return ResponseEntity.ok(teamService.createTeam(game, players).toString());
         } catch (NoSuchPlayerException | TeamException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());

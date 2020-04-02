@@ -7,22 +7,22 @@ import com.yuta4.hat.exceptionas.TeamException;
 import com.yuta4.hat.repositories.TeamRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TeamService {
 
     private TeamRepository teamRepository;
     private PlayerService playerService;
-    private GameService gameService;
 
-    public TeamService(TeamRepository teamRepository, PlayerService playerService, GameService gameService) {
+    public TeamService(TeamRepository teamRepository, PlayerService playerService) {
         this.teamRepository = teamRepository;
         this.playerService = playerService;
-        this.gameService = gameService;
     }
 
-    public Long createTeam(Game game, List<Player> newPlayers) {
+    public Long createTeam(Game game, Set<Player> newPlayers) {
         validateAddingPlayersToTeam(teamRepository.findTeamsByGame(game), newPlayers);
         Team team = new Team();
         team.setGame(game);
@@ -31,7 +31,7 @@ public class TeamService {
         return teamRepository.save(team).getId();
     }
 
-    private void validateAddingPlayersToTeam(List<Team> sameGameTeams, List<Player> newPlayers) {
+    private void validateAddingPlayersToTeam(List<Team> sameGameTeams, Set<Player> newPlayers) {
         if(newPlayers.size() < 2) {
             throw new TeamException("Team should contain more then one player");
         }
@@ -62,9 +62,18 @@ public class TeamService {
 
     public void movePlayerTurn(Player player) {
         Team team = getPlayerTeam(player);
-        List<Player> teamPlayers = team.getPlayers();
-        Player nextPlayer = teamPlayers.indexOf(player) + 1 < teamPlayers.size() ?
-                teamPlayers.get(teamPlayers.indexOf(player) + 1) : teamPlayers.get(0);
+        Set<Player> teamPlayers = team.getPlayers();
+        Iterator<Player> teamPlayersIterator = teamPlayers.iterator();
+        Player firstPlayer = teamPlayersIterator.next();
+        Player nextPlayer = firstPlayer;
+        while (nextPlayer != player) {
+            nextPlayer = teamPlayersIterator.next();
+        }
+        if(teamPlayersIterator.hasNext()) {
+            nextPlayer = teamPlayersIterator.next();
+        } else {
+            nextPlayer = firstPlayer;
+        }
         team.setPlayerTurn(nextPlayer);
         teamRepository.save(team);
     }

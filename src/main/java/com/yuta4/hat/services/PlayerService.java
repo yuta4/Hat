@@ -36,9 +36,9 @@ public class PlayerService implements UserDetailsService {
         playerRepository.save(player);
     }
 
-    public List<Player> getPLayersList(String playerEmails) {
+    public Set<Player> getPLayersList(String playerEmails) {
         String[] emails = playerEmails.split(",");
-        List<Player> players = new ArrayList<>();
+        Set<Player> players = new HashSet<>();
         for(String email : emails) {
             Player player = playerRepository.findByEmail(email).orElseThrow(() -> new NoSuchPlayerException(email));
 

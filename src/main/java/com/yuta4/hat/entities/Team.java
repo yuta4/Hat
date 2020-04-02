@@ -3,7 +3,7 @@ package com.yuta4.hat.entities;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,7 +20,7 @@ public class Team {
     @JoinTable(name = "team_players",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))
-    private List<Player> players;
+    private Set<Player> players;
 
     @ManyToOne
     private Player playerTurn;
