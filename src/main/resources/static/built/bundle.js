@@ -1258,6 +1258,20 @@ module.exports = hoistNonReactStatics;
 
 /***/ }),
 
+/***/ "./node_modules/isarray/index.js":
+/*!***************************************!*\
+  !*** ./node_modules/isarray/index.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/mini-create-react-context/dist/esm/index.js":
 /*!******************************************************************!*\
   !*** ./node_modules/mini-create-react-context/dist/esm/index.js ***!
@@ -1564,7 +1578,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isarray = __webpack_require__(/*! isarray */ "./node_modules/path-to-regexp/node_modules/isarray/index.js")
+var isarray = __webpack_require__(/*! isarray */ "./node_modules/isarray/index.js")
 
 /**
  * Expose `pathToRegexp`.
@@ -1990,20 +2004,6 @@ function pathToRegexp (path, keys, options) {
 
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
-
-
-/***/ }),
-
-/***/ "./node_modules/path-to-regexp/node_modules/isarray/index.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/path-to-regexp/node_modules/isarray/index.js ***!
-  \*******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
 
 
 /***/ }),
@@ -38176,72 +38176,49 @@ var App = /*#__PURE__*/function (_React$Component) {
   var _super = _createSuper(App);
 
   function App(props) {
-    var _this;
-
     _classCallCheck(this, App);
 
-    _this = _super.call(this, props);
-    _this.state = {
-      next: ''
-    };
-    return _this;
+    return _super.call(this, props); // this.state = {next: ''}
   }
 
   _createClass(App, [{
-    key: "redirectToInitScreen",
-    value: function redirectToInitScreen(response) {
-      console.log('redirectToInitScreen ' + response);
-      console.log('response ' + response.status.code + ' ' + response.entity);
-
-      if (response.status.code == 200) {
-        console.log('TeamFormation');
-        this.setState({
-          next: 'TeamFormation',
-          gameId: response.entity
-        });
-      } else {
-        console.log('NewGameScreen');
-        this.setState({
-          next: 'NewGameScreen'
-        });
-      }
-    }
-  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      var _this2 = this;
+      var _this = this;
 
       console.log('componentDidMount');
       client({
         method: 'GET',
         path: '/game'
       }).done(function (response) {
-        _this2.redirectToInitScreen(response);
+        console.log('TeamFormation'); // this.setState({next: 'TeamFormation', gameId: response.entity})
+
+        _this.props.history.push({
+          pathname: '/teams/' + response.entity
+        });
+      }, function () {
+        console.log('NewGameScreen');
+
+        _this.props.history.push({
+          pathname: '/create/'
+        }); // this.setState({next: 'NewGameScreen'})
+
       });
     }
   }, {
     key: "render",
     value: function render() {
-      console.log('1 rendering ' + this.state.next);
-
-      if (this.state.next === 'TeamFormation') {
-        var gid = this.state.gameId;
-        return /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Redirect"], {
-          to: {
-            pathname: '/teams',
-            state: {
-              id: gid
-            }
-          }
-        });
-      } else if (this.state.next === 'NewGameScreen') {
-        return /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Redirect"], {
-          to: {
-            pathname: '/create'
-          }
-        });
-      }
-
+      // console.log('1 rendering ' + this.state.next);
+      // if (this.state.next === 'TeamFormation') {
+      //     const gid = this.state.gameId;
+      //     console.log('render TeamFormation ' + gid);
+      //     console.log('render TeamFormation ' + {gid});
+      //     return (
+      //         <Redirect to={{pathname: '/teams/' + gid}}/>
+      //     )
+      // } else if (this.state.next === 'NewGameScreen') {
+      //     return <Redirect to={{pathname: '/create'}}/>
+      // }
       return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "Loading.."));
     }
   }]);
@@ -38254,18 +38231,17 @@ var TeamFormation = /*#__PURE__*/function (_React$Component2) {
 
   var _super2 = _createSuper(TeamFormation);
 
-  function TeamFormation() {
+  function TeamFormation(props) {
     _classCallCheck(this, TeamFormation);
 
-    return _super2.apply(this, arguments);
+    return _super2.call(this, props);
   }
 
   _createClass(TeamFormation, [{
     key: "render",
     value: function render() {
-      console.log('id' + this.props.id);
-      console.log('location' + this.props.location.id);
-      return /*#__PURE__*/React.createElement("h1", null, "TeamFormation ", this.props.id);
+      console.log('id ' + this.props.match.params.gid);
+      return /*#__PURE__*/React.createElement("h1", null, "TeamFormation ", this.props.match.params.gid);
     }
   }]);
 
@@ -38284,28 +38260,40 @@ var NewGame = /*#__PURE__*/function (_React$Component3) {
   }
 
   _createClass(NewGame, [{
+    key: "createGame",
+    value: function createGame() {
+      client({
+        method: 'GET',
+        path: '/game/create'
+      }).done(function (response) {
+        console.log('NewGame'); // this.setState({next: 'TeamFormation', gameId: response.entity})
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("h1", null, "NewGameScreen");
+      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "NewGameScreen"), /*#__PURE__*/React.createElement("button", {
+        onClick: this.createGame
+      }, "New game"));
     }
   }]);
 
   return NewGame;
 }(React.Component);
 
-ReactDOM.render( /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["BrowserRouter"], null, /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
+ReactDOM.render( /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["BrowserRouter"], null, /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Switch"], null, /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
   path: "/",
   component: App
 }), /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
-  path: "/teams",
+  path: "/teams/:gid",
   component: TeamFormation
 }), /*#__PURE__*/React.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
   path: "/create",
   component: NewGame
-})), document.getElementById('react'));
+}))), document.getElementById('react'));
 
 /***/ }),
 
