@@ -10,9 +10,7 @@ import com.yuta4.hat.services.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -39,15 +37,32 @@ public class GameController {
     @PostMapping("/create")
     public ResponseEntity<Long> startGame(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
-        Game game = player.getLastGame();
-        if(game == null || Boolean.FALSE.equals(game.getIsActive())) {
-            game = gameService.createGame(player);
-            playerService.setLastGame(player, game);
-        }
+        Game game = gameService.createGame(player);
+        playerService.setLastGame(player, game);
         return ResponseEntity.ok().body(game.getId());
     }
 
-    @PostMapping("/finish")
+    @GetMapping
+    public ResponseEntity<Long> getActiveGame(Principal principal) {
+        Player player = playerService.getPlayerByEmail(principal.getName());
+        Game game = player.getLastGame();
+        if(game != null && !Boolean.FALSE.equals(game.getIsActive())) {
+            return ResponseEntity.ok().body(game.getId());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("isOwner")
+    public ResponseEntity<Boolean> isGameOwner(Principal principal) {
+        Player player = playerService.getPlayerByEmail(principal.getName());
+        Game game = player.getLastGame();
+        if(game != null) {
+            return ResponseEntity.ok().body(game.getOwner().equals(player));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/finish")
     public ResponseEntity<Void> finishGame(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = player.getLastGame();
@@ -78,7 +93,7 @@ public class GameController {
         }
     }
 
-    @PostMapping("/round/start")
+    @PutMapping("/round/start")
     public ResponseEntity<List<String>> startRound(Principal principal) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = player.getLastGame();
@@ -87,7 +102,7 @@ public class GameController {
         return ResponseEntity.ok(gameWordService.getNotGuessedWords(game));
     }
 
-    @PostMapping("/round/finish")
+    @PutMapping("/round/finish")
     public ResponseEntity<List<String>> finishRound(Principal principal, @RequestParam List<String> guessedWords) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         gameWordService.markAsGuessed(guessedWords, teamService.getPlayerTeam(player));

@@ -1,60 +1,83 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
+import {Redirect, Route, BrowserRouter, Router} from "react-router-dom";
+
+// const createRoutes = () => (
+//     <Router>
+//         <Route exact path="/teams" component={TeamFormation}/>
+//         <Route exact path="/create" component={NewGame}/>
+//     </Router>
+// );
+//
+// export default createRoutes;
+
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {players: []};
+        this.state = {next: ''}
+    }
+
+    redirectToInitScreen(response) {
+        console.log('redirectToInitScreen ' + response);
+        console.log('response ' + response.status.code + ' ' + response.entity);
+        if (response.status.code == 200) {
+            console.log('TeamFormation');
+            this.setState({next: 'TeamFormation', gameId: response.entity})
+        } else {
+            console.log('NewGameScreen');
+            this.setState({next: 'NewGameScreen'})
+        }
     }
 
     componentDidMount() {
-        client({method: 'GET', path: '/players'}).done(response => {
-            this.setState({players: response.entity});
+        console.log('componentDidMount');
+        client({method: 'GET', path: '/game'}).done(response => {
+            this.redirectToInitScreen(response);
         });
     }
 
     render() {
+        console.log('1 rendering ' + this.state.next);
+        if (this.state.next === 'TeamFormation') {
+            const gid = this.state.gameId;
+            return (
+                <Redirect to={{pathname: '/teams', state: {id: gid} }}/>
+            )
+        } else if(this.state.next === 'NewGameScreen') {
+            return <Redirect to={{pathname: '/create'}}/>
+        }
         return (
-            <PlayerList players={this.state.players}/>
+            <div><h1>Loading..</h1></div>
         )
     }
 }
 
-class PlayerList extends React.Component{
+class TeamFormation extends React.Component {
     render() {
-        const players = this.props.players.map(player =>
-            <Player key={player.email} data={player}/>
-        );
+        console.log('id' + this.props.id);
+        console.log('location' + this.props.location.id);
         return (
-            <table>
-                <tbody>
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                </tr>
-                {players}
-                </tbody>
-            </table>
+            <h1>TeamFormation {this.props.id}</h1>
         )
     }
 }
 
-class Player extends React.Component{
+class NewGame extends React.Component {
     render() {
         return (
-            <tr>
-                <td>{this.props.data.id}</td>
-                <td>{this.props.data.name}</td>
-                <td>{this.props.data.email}</td>
-            </tr>
+            <h1>NewGameScreen</h1>
         )
     }
 }
 
 ReactDOM.render(
-    <App />,
+    <BrowserRouter>
+        <Route exact path="/" component={App}/>
+        <Route exact path="/teams" component={TeamFormation}/>
+        <Route exact path="/create" component={NewGame}/>
+     </BrowserRouter>,
     document.getElementById('react')
-)
+);

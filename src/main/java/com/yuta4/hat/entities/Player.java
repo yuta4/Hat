@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @EqualsAndHashCode(of = "email")
-@ToString(of = "name")
+@ToString(of = {"name", "email"})
 public class Player {
 
     @Id

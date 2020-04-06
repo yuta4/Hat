@@ -4,11 +4,15 @@ import com.yuta4.hat.services.PlayerService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 //@Profile("local")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -20,8 +24,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeRequests().antMatchers("/h2-console").permitAll();
-        httpSecurity.headers().frameOptions().disable();
+        httpSecurity
+                .authorizeRequests()
+                .antMatchers("/h2-console").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().and().
+                headers().frameOptions().disable();
         httpSecurity.csrf().disable()
                 .httpBasic();
     }

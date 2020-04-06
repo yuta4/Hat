@@ -20,7 +20,7 @@ public class GameService {
 
     public Game createGame(Player player) {
         Game game = new Game();
-        game.setCreator(player);
+        game.setOwner(player);
         game.setGameProgress(GameProgress.TEAMS_FORMATION);
         return gameRepository.save(game);
     }

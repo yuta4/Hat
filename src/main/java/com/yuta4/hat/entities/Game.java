@@ -24,7 +24,7 @@ public class Game {
     private Boolean isActive;
 
     @ManyToOne
-    private Player creator;
+    private Player owner;
 
     @Enumerated(EnumType.STRING)
     private GameProgress gameProgress;

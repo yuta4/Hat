@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
@@ -30,7 +31,7 @@ public class GameProgressController {
         this.playerService = playerService;
     }
 
-    @PostMapping("/next")
+    @PutMapping("/next")
     public ResponseEntity<String> nextProgress(Principal principal) {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());
@@ -43,7 +44,7 @@ public class GameProgressController {
         }
     }
 
-    @PostMapping("/previous")
+    @PutMapping("/previous")
     public ResponseEntity<String> previousProgress(Principal principal) {
         try {
             Player player = playerService.getPlayerByEmail(principal.getName());
