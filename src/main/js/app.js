@@ -1,8 +1,20 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const client = require('./client');
-import {BrowserRouter, Route, Router, Switch} from "react-router-dom";
+import {BrowserRouter, Route, Router} from "react-router-dom";
+import TeamFormation from "./components/teamFormation"
+import NewGame from "./components/newGame"
 
+function moveToGameProgressScreen(gid, history) {
+    client({method: 'GET', path: '/progress?gameId=' + gid}).done(response => {
+        console.log('moveToGameProgressScreen ' + response.entity + gid);
+        history.push({pathname: response.entity + gid})
+    }, response => {
+        console.log('moveToGameProgressScreen error ' + response.status);
+    })
+}
+
+export default moveToGameProgressScreen;
 
 class App extends React.Component {
 
@@ -12,9 +24,12 @@ class App extends React.Component {
 
     componentDidMount() {
         console.log('componentDidMount');
+        this.checkActiveGame();
+    }
+
+    checkActiveGame() {
         client({method: 'GET', path: '/game'}).done(response => {
-            console.log('TeamFormation');
-            this.props.history.push({pathname: '/teams/' + response.entity})
+            moveToGameProgressScreen(response.entity, this.props.history);
         }, () => {
             console.log('NewGameScreen');
             this.props.history.push({pathname: '/create/'})
@@ -28,44 +43,11 @@ class App extends React.Component {
     }
 }
 
-class TeamFormation extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        console.log('id ' + this.props.match.params.gid);
-        return (
-            <h1>TeamFormation {this.props.match.params.gid}</h1>
-        )
-    }
-}
-
-class NewGame extends React.Component {
-    createGame() {
-        client({method: 'POST', path: '/game/create'}).done(response => {
-            console.log('NewGame' + response.entity);
-        });
-    }
-
-    render() {
-        return (
-            <div>
-            <h1>NewGameScreen</h1>
-                <button onClick={this.createGame}>New game</button>
-            </div>
-        )
-    }
-}
-
 ReactDOM.render(
     <BrowserRouter>
-        <Switch>
-            <Route exact path="/" component={App}/>
-            <Route exact path="/teams/:gid" component={TeamFormation}/>
-            <Route exact path="/create" component={NewGame}/>
-        </Switch>
+        <Route exact path="/" component={App}/>
+        <Route exact path="/teams/:gid" component={TeamFormation}/>
+        <Route exact path="/create" component={NewGame}/>
     </BrowserRouter>,
     document.getElementById('react')
 );

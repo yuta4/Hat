@@ -2,11 +2,16 @@ package com.yuta4.hat.controllers;
 
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.repositories.PlayerRepository;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.HashSet;
+import java.util.Set;
+
+@RestController
+@RequestMapping("/players")
 public class PlayerController {
 
     private PlayerRepository playerRepository;
@@ -15,8 +20,11 @@ public class PlayerController {
         this.playerRepository = playerRepository;
     }
 
-    @GetMapping("/players")
-    public @ResponseBody Iterable<Player> getAllPlayers() {
-        return playerRepository.findAll();
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<String> getAllPlayerEmails() {
+        Iterable<Player> all = playerRepository.findAll();
+        Set<String> emails = new HashSet<>();
+        all.forEach(player -> emails.add(player.getEmail()));
+        return emails;
     }
 }

@@ -3,21 +3,21 @@ package com.yuta4.hat.controllers;
 import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
-import com.yuta4.hat.exceptionas.GameProgressException;
-import com.yuta4.hat.exceptionas.NoSuchGameException;
+import com.yuta4.hat.exceptions.GameProgressException;
+import com.yuta4.hat.exceptions.NoSuchGameException;
 import com.yuta4.hat.services.GameProgressService;
 import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.PlayerService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Set;
 
-@Controller
+@RestController
 @RequestMapping("/progress")
 public class GameProgressController {
 
@@ -55,5 +55,11 @@ public class GameProgressController {
         } catch (NoSuchGameException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Set<String> getGameProgress(@RequestParam Long gameId) {
+        Game game = gameService.getGameById(gameId);
+        return Collections.singleton(game.getGameProgress().getPath());
     }
 }

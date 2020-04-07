@@ -2,8 +2,8 @@ package com.yuta4.hat.controllers;
 
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
-import com.yuta4.hat.exceptionas.NoSuchPlayerException;
-import com.yuta4.hat.exceptionas.TeamException;
+import com.yuta4.hat.exceptions.NoSuchPlayerException;
+import com.yuta4.hat.exceptions.TeamException;
 import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.PlayerService;
 import com.yuta4.hat.services.TeamService;

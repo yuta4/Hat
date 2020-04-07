@@ -4,7 +4,7 @@ import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.entities.Word;
-import com.yuta4.hat.exceptionas.WordException;
+import com.yuta4.hat.exceptions.WordException;
 import com.yuta4.hat.repositories.GameRepository;
 import com.yuta4.hat.repositories.GameWordRepository;
 import com.yuta4.hat.repositories.WordRepository;

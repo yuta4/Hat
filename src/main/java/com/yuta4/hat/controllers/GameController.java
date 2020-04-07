@@ -5,7 +5,7 @@ import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.entities.Word;
-import com.yuta4.hat.exceptionas.NoSuchGameException;
+import com.yuta4.hat.exceptions.NoSuchGameException;
 import com.yuta4.hat.services.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

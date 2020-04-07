@@ -1,12 +1,19 @@
 package com.yuta4.hat;
 
 public enum GameProgress {
-    TEAMS_FORMATION,
-    GENERATING_WORDS,
-    FIRST_ROUND,
-    SECOND_ROUND,
-    THIRD_ROUND,
-    SUMMERY_VIEW;
+    CREATE_GAME("/create"),
+    TEAMS_FORMATION("/teams/"),
+    GENERATING_WORDS("/words/"),
+    FIRST_ROUND("/first/"),
+    SECOND_ROUND("/second/"),
+    THIRD_ROUND("/third/"),
+    SUMMERY_VIEW("/summary/");
+
+    private final String path;
+
+    private GameProgress(String path) {
+        this.path = path;
+    }
 
     private static GameProgress[] vals = values();
 
@@ -20,4 +27,7 @@ public enum GameProgress {
         return vals[(this.ordinal() - 1) % vals.length];
     }
 
+    public String getPath() {
+        return path;
+    }
 }

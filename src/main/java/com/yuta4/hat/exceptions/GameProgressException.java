@@ -1,4 +1,4 @@
-package com.yuta4.hat.exceptionas;
+package com.yuta4.hat.exceptions;
 
 import com.yuta4.hat.GameProgress;
 

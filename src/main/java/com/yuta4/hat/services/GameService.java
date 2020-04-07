@@ -4,6 +4,7 @@ import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
+import com.yuta4.hat.exceptions.GameNotFoundException;
 import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.stereotype.Service;
 
@@ -41,5 +42,9 @@ public class GameService {
         Team nextTeam = teams.indexOf(team) + 1 < teams.size() ? teams.get(teams.indexOf(team) + 1) : teams.get(0);
         game.setTeamTurn(nextTeam);
         gameRepository.save(game);
+    }
+
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
     }
 }

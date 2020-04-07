@@ -3,7 +3,7 @@ package com.yuta4.hat.services;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
-import com.yuta4.hat.exceptionas.TeamException;
+import com.yuta4.hat.exceptions.TeamException;
 import com.yuta4.hat.repositories.TeamRepository;
 import org.springframework.stereotype.Service;
 

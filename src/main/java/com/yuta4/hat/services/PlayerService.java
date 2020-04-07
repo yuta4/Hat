@@ -1,6 +1,6 @@
 package com.yuta4.hat.services;
 
-import com.yuta4.hat.exceptionas.NoSuchPlayerException;
+import com.yuta4.hat.exceptions.NoSuchPlayerException;
 import com.yuta4.hat.PlayerPrincipal;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;

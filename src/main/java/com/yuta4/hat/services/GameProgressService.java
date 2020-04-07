@@ -4,7 +4,7 @@ import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
-import com.yuta4.hat.exceptionas.GameProgressException;
+import com.yuta4.hat.exceptions.GameProgressException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
