@@ -1,4 +1,4 @@
-import Select from 'react-select';
+import select from 'react-select';
 
 const React = require('react');
 const client = require('../client');
@@ -9,29 +9,34 @@ class TeamFormation extends React.Component {
         console.log("TeamFormation constructor")
         super(props);
         this.state = {playersAvailable: []}
+        this.handleNewPlayer = this.handleNewPlayer.bind(this)
     }
 
     componentDidMount() {
+        console.log('calling /players')
         client({method: 'GET', path: '/players'}).done(response => {
             const items = [];
-            response.entity.map((data) => {
+            response.entity.map((data, index) => {
 
-                items.push(<option key={data} value={data}>{data}</option>);
-                //here I will be creating my options dynamically based on
-                //what props are currently passed to the parent component
+                items.push(<option key={index}>{data}</option>);
             });
             this.setState({playersAvailable: items});
-
         });
     }
 
+    handleNewPlayer(event) {
+        const selected = event.target.value;
+        // this.setState({playersAvailable: })
+    }
+
+
     render() {
-        console.log('TeamFormation render id ' + this.props.match.params.gid);
+        console.log('TeamFormation render id ' + this.state.playersAvailable + ',' + this.props.match.params.gid);
+        // const opts = this.state.playersAvailable;
         return (
             <div>
                 <h1>TeamFormation {this.props.match.params.gid}</h1>
-                //TODO: move to player level
-                <Select options={this.state.playersAvailable}/>
+                <Team playersAvailable={this.state.playersAvailable} handleNewPlayer={this.handleNewPlayer}/>
             </div>
         )
     }
@@ -45,7 +50,9 @@ class Team extends React.Component {
     }
 
     render() {
-
+        return (
+            <NewPlayer playersAvailable={this.props.playersAvailable} handleNewPlayer={this.props.handleNewPlayer}/>
+        );
     }
 }
 
@@ -57,15 +64,15 @@ class Player extends React.Component {
     }
 
     render() {
-        <Select options={techCompanies}/>
+
     }
 }
 
 class NewPlayer extends React.Component {
 
-
     render() {
-
+        const opts = this.props.playersAvailable;
+        return <select onClick={event => this.props.handleNewPlayer(event)}>{opts}</select>
     }
 }
 

@@ -45301,6 +45301,7 @@ var TeamFormation = /*#__PURE__*/function (_React$Component) {
     _this.state = {
       playersAvailable: []
     };
+    _this.handleNewPlayer = _this.handleNewPlayer.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -45309,17 +45310,16 @@ var TeamFormation = /*#__PURE__*/function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
+      console.log('calling /players');
       client({
         method: 'GET',
         path: '/players'
       }).done(function (response) {
         var items = [];
-        response.entity.map(function (data) {
+        response.entity.map(function (data, index) {
           items.push( /*#__PURE__*/React.createElement("option", {
-            key: data,
-            value: data
-          }, data)); //here I will be creating my options dynamically based on
-          //what props are currently passed to the parent component
+            key: index
+          }, data));
         });
 
         _this2.setState({
@@ -45328,11 +45328,18 @@ var TeamFormation = /*#__PURE__*/function (_React$Component) {
       });
     }
   }, {
+    key: "handleNewPlayer",
+    value: function handleNewPlayer(event) {
+      var selected = event.target.value; // this.setState({playersAvailable: })
+    }
+  }, {
     key: "render",
     value: function render() {
-      console.log('TeamFormation render id ' + this.props.match.params.gid);
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "TeamFormation ", this.props.match.params.gid), "//TODO: move to player level", /*#__PURE__*/React.createElement(react_select__WEBPACK_IMPORTED_MODULE_0__["default"], {
-        options: this.state.playersAvailable
+      console.log('TeamFormation render id ' + this.state.playersAvailable + ',' + this.props.match.params.gid); // const opts = this.state.playersAvailable;
+
+      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "TeamFormation ", this.props.match.params.gid), /*#__PURE__*/React.createElement(Team, {
+        playersAvailable: this.state.playersAvailable,
+        handleNewPlayer: this.handleNewPlayer
       }));
     }
   }]);
@@ -45353,7 +45360,12 @@ var Team = /*#__PURE__*/function (_React$Component2) {
 
   _createClass(Team, [{
     key: "render",
-    value: function render() {}
+    value: function render() {
+      return /*#__PURE__*/React.createElement(NewPlayer, {
+        playersAvailable: this.props.playersAvailable,
+        handleNewPlayer: this.props.handleNewPlayer
+      });
+    }
   }]);
 
   return Team;
@@ -45378,12 +45390,7 @@ var Player = /*#__PURE__*/function (_React$Component3) {
 
   _createClass(Player, [{
     key: "render",
-    value: function render() {
-      /*#__PURE__*/
-      React.createElement(react_select__WEBPACK_IMPORTED_MODULE_0__["default"], {
-        options: techCompanies
-      });
-    }
+    value: function render() {}
   }]);
 
   return Player;
@@ -45402,7 +45409,16 @@ var NewPlayer = /*#__PURE__*/function (_React$Component4) {
 
   _createClass(NewPlayer, [{
     key: "render",
-    value: function render() {}
+    value: function render() {
+      var _this4 = this;
+
+      var opts = this.props.playersAvailable;
+      return /*#__PURE__*/React.createElement("select", {
+        onClick: function onClick(event) {
+          return _this4.props.handleNewPlayer(event);
+        }
+      }, opts);
+    }
   }]);
 
   return NewPlayer;
