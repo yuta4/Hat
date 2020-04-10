@@ -1,7 +1,7 @@
 package com.yuta4.hat;
 
 public enum GameProgress {
-    CREATE_GAME("/create"),
+//    CREATE_GAME("/create"),
     TEAMS_FORMATION("/teams/"),
     GENERATING_WORDS("/words/"),
     FIRST_ROUND("/first/"),
@@ -27,7 +27,7 @@ public enum GameProgress {
         return vals[(this.ordinal() - 1) % vals.length];
     }
 
-    public String getPath() {
-        return path;
+    public String getPath(Long gameId) {
+        return path + gameId;
     }
 }

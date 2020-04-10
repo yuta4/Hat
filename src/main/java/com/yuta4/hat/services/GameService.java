@@ -9,6 +9,8 @@ import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GameService {
@@ -46,5 +48,11 @@ public class GameService {
 
     public Game getGameById(Long gameId) {
         return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
+    }
+
+    public Set<String> getWatchersEmails(Long gameID) {
+        return getGameById(gameID).getWatchers().stream()
+                .map(Player::getEmail)
+                .collect(Collectors.toSet());
     }
 }

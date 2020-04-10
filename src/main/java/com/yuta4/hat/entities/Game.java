@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -28,6 +29,12 @@ public class Game {
 
     @Enumerated(EnumType.STRING)
     private GameProgress gameProgress;
+
+    @OneToMany
+    @JoinTable(name = "game_watcher",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_id"))
+    private Set<Player> watchers;
 
     @OneToOne
     private Team teamTurn;

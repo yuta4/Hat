@@ -22,32 +22,32 @@ public class TeamService {
         this.playerService = playerService;
     }
 
-    public Long createTeam(Game game, Set<Player> newPlayers) {
-        validateAddingPlayersToTeam(teamRepository.findTeamsByGame(game), newPlayers);
+    public Long createTeam(Game game) {
         Team team = new Team();
         team.setGame(game);
-        team.setPlayers(newPlayers);
-        newPlayers.forEach(player -> playerService.setLastGame(player, game));
         return teamRepository.save(team).getId();
     }
 
-    private void validateAddingPlayersToTeam(List<Team> sameGameTeams, Set<Player> newPlayers) {
-        if(newPlayers.size() < 2) {
-            throw new TeamException("Team should contain more then one player");
+    public Boolean addPlayerToTeam(Team team, Player newPlayer) {
+        Game game = team.getGame();
+        validateAddingPlayersToTeam(getGameTeams(game), newPlayer);
+        team.getPlayers().add(newPlayer);
+        playerService.setLastGame(newPlayer, game);
+        return true;
+    }
+
+    private void validateAddingPlayersToTeam(List<Team> sameGameTeams, Player newPlayer) {
+        if(Boolean.TRUE.equals(newPlayer.getLastGame().getIsActive())) {
+            throw new TeamException(
+                    String.format("Can't add player %s to the team because he has not finished game", newPlayer));
         }
-        newPlayers.forEach(newPlayer -> {
-            if(Boolean.TRUE.equals(newPlayer.getLastGame().getIsActive())) {
-                throw new TeamException(
-                        String.format("Can't add player %s to the team because he has not finished game", newPlayer));
-            }
-        });
-        sameGameTeams.forEach(team -> newPlayers.forEach(newPlayer -> {
+        sameGameTeams.forEach(team -> {
             if(team.getPlayers().contains(newPlayer)) {
                 throw new TeamException(
                         String.format("%s can't be added to new team as he is already present in team %s",
                                 newPlayer, team.getPlayers()));
             }
-        }));
+        });
     }
 
     public List<Team> getGameTeams(Game game) {
@@ -78,4 +78,13 @@ public class TeamService {
         teamRepository.save(team);
     }
 
+    public Boolean deleteTeam(Long teamId) {
+        teamRepository.delete(
+                getTeamOrThrow(teamId));
+        return true;
+    }
+
+    public Team getTeamOrThrow(Long teamId) {
+        return teamRepository.findById(teamId).orElseThrow(() -> new TeamException("No team with id found : " + teamId));
+    }
 }
