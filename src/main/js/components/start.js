@@ -1,4 +1,3 @@
-// import moveToGameProgressScreen from "../app";
 import  React, {useEffect} from "react";
 import { useStoreActions } from "easy-peasy";
 const client = require('../client');
@@ -15,7 +14,7 @@ const Start = (props) => {
             moveToGameProgressScreen(props.history);
         }, () => {
             console.log('NewGameScreen');
-            this.props.history.push({pathname: '/create/'})
+            props.history.push({pathname: '/create/'})
         });
     }
 

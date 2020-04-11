@@ -2,14 +2,25 @@ import React from 'react';
 import { useStoreActions } from "easy-peasy";
 const client = require('../client');
 
-const NewGame = () => {
+const NewGame = (props) => {
+
+    const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
+    const setGamesToJoin = useStoreActions(actions => actions.setGamesToJoin);
+    const setGameId = useStoreActions(actions => actions.setGameId);
 
     function createGame() {
-        const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
-
         client({method: 'POST', path: '/game/create'}).done(response => {
             console.log('NewGame ' + response.entity);
-            moveToGameProgressScreen(response.entity, this.props.history)
+            setGameId(response.entity);
+            moveToGameProgressScreen(response.entity, props.history)
+        });
+    }
+
+    function moveToJoinGameOption() {
+        client({method: 'GET', path: '/game/notStarted'}).done(response => {
+            console.log('NewGame ' + response.entity);
+            setGamesToJoin(response.entity);
+            props.history.push({pathname: "/join"});
         });
     }
 
@@ -17,6 +28,7 @@ const NewGame = () => {
         <div>
             <h1>NewGameScreen</h1>
             <button onClick={createGame}>Create new game</button>
+            <button onClick={moveToJoinGameOption}>Join existing one</button>
         </div>
     )
 };

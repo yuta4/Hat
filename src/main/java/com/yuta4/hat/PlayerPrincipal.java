@@ -26,7 +26,7 @@ public class PlayerPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return player.getEmail();
+        return player.getLogin();
     }
 
     @Override

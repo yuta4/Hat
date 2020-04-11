@@ -9,8 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@EqualsAndHashCode(of = "email")
-@ToString(of = {"name", "email"})
+@EqualsAndHashCode(of = "login")
+@ToString(of = {"name", "login"})
 public class Player {
 
     @Id
@@ -30,7 +30,7 @@ public class Player {
     @JsonIgnore
     private Game lastGame;
 
-//    @NonNull
-    //TODO: add login
+    @Column(nullable = false, unique = true)
+    private String login;
 
 }

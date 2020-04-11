@@ -50,13 +50,18 @@ public class GameService {
         return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
     }
 
-    public Set<String> addAndGetWatchersEmails(Long gameID, Player playerToAdd, Set<Player> players) {
+    public Set<String> addAndGetWatchersLogin(Long gameID, Player playerToAdd, Set<Player> players) {
         Game game = getGameById(gameID);
         if(!game.getOwner().equals(playerToAdd) && !players.contains(playerToAdd)) {
             game.getWatchers().add(playerToAdd);
+            gameRepository.save(game);
         }
         return game.getWatchers().stream()
-                .map(Player::getEmail)
+                .map(Player::getLogin)
                 .collect(Collectors.toSet());
+    }
+
+    public Set<Game> getNotStartedGames() {
+        return gameRepository.findGamesByIsActiveIsNull();
     }
 }

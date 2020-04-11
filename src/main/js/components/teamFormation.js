@@ -18,10 +18,10 @@ const TeamFormation = (props) => {
         <div>
             <h1>TeamFormation {props.match.params.gid}</h1>
             <Team playersAvailable={players} handleNewPlayer={handleNewPlayer}/>
+            <p/>
             <Watchers/>
         </div>
     )
-    // }
 };
 
 const Watchers = () => {
@@ -30,15 +30,17 @@ const Watchers = () => {
 
     return (
         <div>
-            <Label color='red' horizontal>{owner}</Label>
-            {watchers.map(watcher => {
-                <Label color='green' horizontal>{watcher}</Label>
-            })}
+            <Label color='red' key={owner} horizontal>{owner}</Label>
+            {watchers.map(watcher => (
+                <Label color='green' key={watcher} horizontal>{watcher}</Label>
+            ))}
         </div>
     )
 };
 
 const Team = ((props) => {
+
+    const owner = useStoreState(state => state.owner);
 
     return (
         <NewPlayer playersAvailable={props.playersAvailable} handleNewPlayer={props.handleNewPlayer}/>

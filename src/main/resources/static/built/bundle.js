@@ -97970,7 +97970,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = (function (r
 /*!****************************!*\
   !*** ./src/main/js/app.js ***!
   \****************************/
-/*! exports provided: default */
+/*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -97980,9 +97980,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_teamFormation__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/teamFormation */ "./src/main/js/components/teamFormation.js");
 /* harmony import */ var _components_newGame__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/newGame */ "./src/main/js/components/newGame.js");
 /* harmony import */ var _components_start__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/start */ "./src/main/js/components/start.js");
-/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./model */ "./src/main/js/model.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _components_join__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/join */ "./src/main/js/components/join.js");
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./model */ "./src/main/js/model.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_7__);
+
 
 
 
@@ -97995,36 +97997,25 @@ var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/in
 
 var client = __webpack_require__(/*! ./client */ "./src/main/js/client.js");
 
-function moveToGameProgressScreen(gid, history) {
-  client({
-    method: 'GET',
-    path: '/progress?gameId=' + gid
-  }).done(function (response) {
-    console.log('moveToGameProgressScreen ' + response.entity + gid);
-    history.push({
-      pathname: response.entity + gid
-    });
-  }, function (response) {
-    console.log('moveToGameProgressScreen error ' + response.status);
-  });
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (moveToGameProgressScreen);
-var store = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["createStore"])(_model__WEBPACK_IMPORTED_MODULE_5__["default"]);
-ReactDOM.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["StoreProvider"], {
+var store = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["createStore"])(_model__WEBPACK_IMPORTED_MODULE_6__["default"]);
+ReactDOM.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["StoreProvider"], {
   store: store
-}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["BrowserRouter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
+}, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["BrowserRouter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
   path: "/",
   component: _components_start__WEBPACK_IMPORTED_MODULE_4__["default"]
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
+}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
   path: "/teams/:gid",
   component: _components_teamFormation__WEBPACK_IMPORTED_MODULE_2__["default"]
-}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_6___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
+}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
   exact: true,
   path: "/create",
   component: _components_newGame__WEBPACK_IMPORTED_MODULE_3__["default"]
+}), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_0__["Route"], {
+  exact: true,
+  path: "/join",
+  component: _components_join__WEBPACK_IMPORTED_MODULE_5__["default"]
 }))), document.getElementById('react'));
 
 /***/ }),
@@ -98064,6 +98055,65 @@ module.exports = rest.wrap(mime, {
 
 /***/ }),
 
+/***/ "./src/main/js/components/join.js":
+/*!****************************************!*\
+  !*** ./src/main/js/components/join.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var easy_peasy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! easy-peasy */ "./node_modules/easy-peasy/dist/easy-peasy.esm.js");
+/* harmony import */ var semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! semantic-ui-react */ "./node_modules/semantic-ui-react/dist/es/index.js");
+
+
+
+
+var JoinScreen = function JoinScreen(props) {
+  var gamesToJoin = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
+    return state.games_to_join;
+  });
+  var moveToGameProgressScreen = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
+    return actions.moveToGameProgressScreen;
+  });
+  var setGameId = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
+    return actions.setGameId;
+  });
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    console.log('JoinScreen useEffect' + {
+      gamesToJoin: gamesToJoin
+    });
+  });
+
+  function joinGame(id) {
+    setGameId(id);
+    moveToGameProgressScreen(props.history);
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Join"), gamesToJoin.map(function (game) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      key: game.gameId
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__["Button"], {
+      onClick: function onClick() {
+        return joinGame(game.gameId);
+      }
+    }, "Join"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__["Label"], {
+      color: "blue",
+      horizontal: true
+    }, game.gameId), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__["Label"], {
+      color: "yellow",
+      horizontal: true
+    }, game.login));
+  }));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (JoinScreen);
+
+/***/ }),
+
 /***/ "./src/main/js/components/newGame.js":
 /*!*******************************************!*\
   !*** ./src/main/js/components/newGame.js ***!
@@ -98076,36 +98126,51 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var easy_peasy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! easy-peasy */ "./node_modules/easy-peasy/dist/easy-peasy.esm.js");
- // import moveToGameProgressScreen from "../app";
 
 
 
 var client = __webpack_require__(/*! ../client */ "./src/main/js/client.js");
 
-var NewGame = function NewGame() {
-  // class NewGame extends React.Component {
-  // constructor(props) {
-  //     super(props);
-  //     this.createGame = this.createGame.bind(this);
-  // }
-  function createGame() {
-    var _this = this;
+var NewGame = function NewGame(props) {
+  var moveToGameProgressScreen = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
+    return actions.moveToGameProgressScreen;
+  });
+  var setGamesToJoin = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
+    return actions.setGamesToJoin;
+  });
+  var setGameId = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
+    return actions.setGameId;
+  });
 
-    var moveToGameProgressScreen = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
-      return actions.moveToGameProgressScreen;
-    });
+  function createGame() {
     client({
       method: 'POST',
       path: '/game/create'
     }).done(function (response) {
       console.log('NewGame ' + response.entity);
-      moveToGameProgressScreen(response.entity, _this.props.history);
+      setGameId(response.entity);
+      moveToGameProgressScreen(response.entity, props.history);
+    });
+  }
+
+  function moveToJoinGameOption() {
+    client({
+      method: 'GET',
+      path: '/game/notStarted'
+    }).done(function (response) {
+      console.log('NewGame ' + response.entity);
+      setGamesToJoin(response.entity);
+      props.history.push({
+        pathname: "/join"
+      });
     });
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "NewGameScreen"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
     onClick: createGame
-  }, "Create new game"));
+  }, "Create new game"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    onClick: moveToJoinGameOption
+  }, "Join existing one"));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (NewGame);
@@ -98124,30 +98189,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var easy_peasy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! easy-peasy */ "./node_modules/easy-peasy/dist/easy-peasy.esm.js");
-// import moveToGameProgressScreen from "../app";
 
 
 
-var client = __webpack_require__(/*! ../client */ "./src/main/js/client.js"); // class Start extends React.Component {
-
+var client = __webpack_require__(/*! ../client */ "./src/main/js/client.js");
 
 var Start = function Start(props) {
-  // const {moveToGameProgressScreen, setGameId} = useStoreActions(actions => ({
-  //     moveToGameProgressScreen: actions.moveToGameProgressScreen,
-  //     setGameId: actions.setGameID
-  // }));
   var setGameId = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
     return actions.setGameId;
   });
   var moveToGameProgressScreen = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreActions"])(function (actions) {
     return actions.moveToGameProgressScreen;
-  }); // constructor(props) {
-  //     super(props);
-  // }
+  });
 
   function checkActiveGame() {
-    var _this = this;
-
     client({
       method: 'GET',
       path: '/game'
@@ -98156,13 +98211,11 @@ var Start = function Start(props) {
       moveToGameProgressScreen(props.history);
     }, function () {
       console.log('NewGameScreen');
-
-      _this.props.history.push({
+      props.history.push({
         pathname: '/create/'
       });
     });
-  } // componentDidMount() {
-
+  }
 
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
     console.log('componentDidMount');
@@ -98184,11 +98237,11 @@ var Start = function Start(props) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.browser.esm.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var easy_peasy__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! easy-peasy */ "./node_modules/easy-peasy/dist/easy-peasy.esm.js");
-/* harmony import */ var semantic_ui_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! semantic-ui-react */ "./node_modules/semantic-ui-react/dist/es/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var easy_peasy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! easy-peasy */ "./node_modules/easy-peasy/dist/easy-peasy.esm.js");
+/* harmony import */ var semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! semantic-ui-react */ "./node_modules/semantic-ui-react/dist/es/index.js");
+/* harmony import */ var react_select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-select */ "./node_modules/react-select/dist/react-select.browser.esm.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -98206,60 +98259,36 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
-
-var client = __webpack_require__(/*! ../client */ "./src/main/js/client.js"); // class TeamFormation extends React.Component {
-
-
 var TeamFormation = function TeamFormation(props) {
-  // constructor(props) {
-  //     console.log("TeamFormation constructor")
-  //     super(props);
-  //     this.state = {playersAvailable: []}
-  //     this.handleNewPlayer = this.handleNewPlayer.bind(this)
-  // }
-  Object(react__WEBPACK_IMPORTED_MODULE_1__["useEffect"])(function () {// componentDidMount() {
-    //     console.log('calling /players')
-    // client({method: 'GET', path: '/players'}).done(response => {
-    //     const items = [];
-    //     response.entity.map((data, index) => {
-    //
-    //         items.push(<option key={index}>{data}</option>);
-    //     });
-    //     this.setState({playersAvailable: items});
-    // });
-  });
-
   function handleNewPlayer(event) {
-    var selected = event.target.value; // this.setState({playersAvailable: })
+    var selected = event.target.value;
   }
 
-  var players = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  var players = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.game_players;
   });
-  var owner = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  var owner = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.owner;
   });
-  console.log('TeamFormation render id ' + players + ',' + props.match.params.gid); // const opts = this.state.playersAvailable;
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h1", null, "TeamFormation ", props.match.params.gid), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(Team, {
+  console.log('TeamFormation render id ' + players + ',' + props.match.params.gid);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "TeamFormation ", props.match.params.gid), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Team, {
     playersAvailable: players,
     handleNewPlayer: handleNewPlayer
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(Watchers, null)); // }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Watchers, null)); // }
 };
 
 var Watchers = function Watchers() {
-  var watchers = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  var watchers = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.game_watchers;
   });
-  var owner = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  var owner = Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.owner;
   });
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_3__["Label"], {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__["Label"], {
     color: "red",
     horizontal: true
   }, owner), watchers.map(function (watcher) {
-    /*#__PURE__*/
-    react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_3__["Label"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(semantic_ui_react__WEBPACK_IMPORTED_MODULE_2__["Label"], {
       color: "green",
       horizontal: true
     }, watcher);
@@ -98267,34 +98296,28 @@ var Watchers = function Watchers() {
 };
 
 var Team = function Team(props) {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(NewPlayer, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(NewPlayer, {
     playersAvailable: props.playersAvailable,
     handleNewPlayer: props.handleNewPlayer
   });
 };
 
-var Player = function Player() {// constructor(props) {
-  //     super(props);
-  //     this.state = {email: string}
-  // }
-};
+var Player = function Player() {};
 
 var NewPlayer = function NewPlayer(props) {
-  var watchers = [].concat(_toConsumableArray(Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  var watchers = [].concat(_toConsumableArray(Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.game_watchers;
-  })), [Object(easy_peasy__WEBPACK_IMPORTED_MODULE_2__["useStoreState"])(function (state) {
+  })), [Object(easy_peasy__WEBPACK_IMPORTED_MODULE_1__["useStoreState"])(function (state) {
     return state.owner;
-  })]); // render() {
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_select__WEBPACK_IMPORTED_MODULE_0__["default"], {
+  })]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_select__WEBPACK_IMPORTED_MODULE_3__["default"], {
     options: watchers.map(function (watcher) {
       return {
         value: watcher,
         label: watcher
       };
     })
-  }); // return <Select onClick={event => props.handleNewPlayer(event)} options={watchers}/>
-  // }
+  });
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (TeamFormation);
@@ -98323,6 +98346,7 @@ var client = __webpack_require__(/*! ./client */ "./src/main/js/client.js");
   path_data: [],
   game_players: [],
   game_watchers: [],
+  games_to_join: [],
   //thunk
   moveToGameProgressScreen: Object(easy_peasy__WEBPACK_IMPORTED_MODULE_0__["thunk"])(function (actions, history, helpers) {
     var gid = helpers.getStoreState().gid;
@@ -98347,8 +98371,11 @@ var client = __webpack_require__(/*! ./client */ "./src/main/js/client.js");
     state.owner = entity.owner;
     state.path = entity.path;
     state.path_data = entity.path_data !== undefined ? entity.path_data : [];
-    state.game_players = entity.game_players !== undefined ? entity.game_players : [];
-    state.game_watchers = entity.game_watchers !== undefined ? entity.game_watchers : [];
+    state.game_players = entity.players !== undefined ? entity.players : [];
+    state.game_watchers = entity.watchers !== undefined ? entity.watchers : [];
+  }),
+  setGamesToJoin: Object(easy_peasy__WEBPACK_IMPORTED_MODULE_0__["action"])(function (state, games) {
+    state.games_to_join = games !== undefined ? games : [];
   })
 });
 

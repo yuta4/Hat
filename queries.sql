@@ -29,12 +29,12 @@ insert into word (id,string,level,used) values (28, 'EightEightEight','HARD',0);
 insert into word (id,string,level,used) values (29, 'NineNineNine','HARD',0);
 insert into word (id,string,level,used) values (30, 'TenTenTen','HARD',0);
 
-insert into player (id,email,name,password) values (1, 'yura.berezin@gmail.com','Yura','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
-insert into player (id,email,name,password) values (2, 'gapchukirina@gmail.com','Irunia','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
-insert into player (id,email,name,password) values (3, 'dimka@gmail.com','Dima','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
-insert into player (id,email,name,password) values (4, 'anna@gmail.com','Anna','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
-insert into player (id,email,name,password) values (5, 'lesya@gmail.com','Lesya','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
-insert into player (id,email,name,password) values (6, 'yuraf@gmail.com','Yura','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (1, 'yuta4', 'yura.berezin@gmail.com','Yura','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (2, 'irunia', 'gapchukirina@gmail.com','Irunia','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (3, 'dima_rk_15', 'dimka@gmail.com','Dima','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (4, 'anna', 'anna@gmail.com','Anna','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (5, 'lesya', 'lesya@gmail.com','Lesya','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
+insert into player (id,login,email,name,password) values (6, 'Mafiozy', 'yuraf@gmail.com','Yura','$2a$10$wp1nBzyZwh6cX3jn31NfW.H4IT3mspVB6USZhVpSqC4dLH0QFHlmi');
 
 SELECT * FROM GAME ;
 SELECT * FROM GAME_WORD  ;

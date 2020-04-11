@@ -62,16 +62,16 @@ public class GameProgressController {
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> getGameProgress(Principal principal, @RequestParam Long gameId) {
-        Player player = playerService.getPlayerByEmail(principal.getName());
+        Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         Set<Player> gamePlayers = teamService.getGamePlayers(game);
-        Set<String> gamePlayersEmails = gamePlayers.stream()
-                .map(Player::getEmail)
+        Set<String> gamePlayersLogin = gamePlayers.stream()
+                .map(Player::getLogin)
                 .collect(Collectors.toSet());
-        Set<String> watchersEmails = gameService.addAndGetWatchersEmails(gameId, player, gamePlayers);
+        Set<String> watchersLogin = gameService.addAndGetWatchersLogin(gameId, player, gamePlayers);
         return Map.of("path", game.getGameProgress().getPath(gameId),
-                "owner", game.getOwner().getEmail(),
-                "watchers", watchersEmails,
-                "players", gamePlayersEmails);
+                "owner", game.getOwner().getLogin(),
+                "watchers", watchersLogin,
+                "players", gamePlayersLogin);
     }
 }

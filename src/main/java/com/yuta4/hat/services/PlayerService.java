@@ -19,13 +19,13 @@ public class PlayerService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) {
-        Player user = playerRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+    public UserDetails loadUserByUsername(String login) {
+        Player user = playerRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException(login));
         return new PlayerPrincipal(user);
     }
 
-    public Player getPlayerByEmail(String email) {
-        return playerRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+    public Player getPlayerByLogin(String login) {
+        return playerRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException(login));
     }
 
     public void setLastGame(Player player, Game game) {

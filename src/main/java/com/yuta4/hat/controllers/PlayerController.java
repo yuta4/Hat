@@ -21,10 +21,10 @@ public class PlayerController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<String> getAllPlayerEmails() {
+    public Set<String> getAllPlayersLogin() {
         Iterable<Player> all = playerRepository.findAll();
-        Set<String> emails = new HashSet<>();
-        all.forEach(player -> emails.add(player.getEmail()));
-        return emails;
+        Set<String> login = new HashSet<>();
+        all.forEach(player -> login.add(player.getLogin()));
+        return login;
     }
 }

@@ -37,7 +37,7 @@ public class TeamController {
     @PostMapping("/create")
     public ResponseEntity<String> createTeam(Principal principal, @RequestParam Long gameID) {
         try {
-            Player player = playerService.getPlayerByEmail(principal.getName());
+            Player player = playerService.getPlayerByLogin(principal.getName());
             Game game = player.getLastGame();
             requestValidationService.validate(gameID, player, game);
             return ResponseEntity.ok(teamService.createTeam(game).toString());
@@ -49,7 +49,7 @@ public class TeamController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteTeam(Principal principal, @RequestParam Long gameId, @RequestParam Long teamId) {
         try {
-            Player player = playerService.getPlayerByEmail(principal.getName());
+            Player player = playerService.getPlayerByLogin(principal.getName());
             Game game = player.getLastGame();
             requestValidationService.validate(gameId, player, game);
             return ResponseEntity.ok(teamService.deleteTeam(teamId).toString());
@@ -59,13 +59,13 @@ public class TeamController {
     }
 
     @PostMapping("/extend")
-    public ResponseEntity<String> extendTeam(Principal principal, @RequestParam String playerEmail,
+    public ResponseEntity<String> extendTeam(Principal principal, @RequestParam String playerLogin,
                                              @RequestParam Long teamId, @RequestParam Long gameId) {
         try {
-            Player player = playerService.getPlayerByEmail(principal.getName());
+            Player player = playerService.getPlayerByLogin(principal.getName());
             Game game = player.getLastGame();
             requestValidationService.validate(gameId, player, game);
-            Player newTeamPlayer = playerService.getPlayerByEmail(playerEmail);
+            Player newTeamPlayer = playerService.getPlayerByLogin(playerLogin);
             Team team = teamService.getTeamOrThrow(teamId);
             return ResponseEntity.ok(teamService.addPlayerToTeam(team, newTeamPlayer).toString());
         } catch (UsernameNotFoundException | TeamException | RequestValidationException ex) {

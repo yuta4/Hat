@@ -6,5 +6,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.util.Optional;
 
 public interface PlayerRepository extends PagingAndSortingRepository<Player, Long> {
-    Optional<Player> findByEmail(String email);
+    Optional<Player> findByLogin(String login);
 }
