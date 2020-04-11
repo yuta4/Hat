@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {useStoreState} from "easy-peasy";
 import {Label} from 'semantic-ui-react'
 import Select from 'react-select'
+import Login from "./login";
 
 const TeamFormation = (props) => {
 
@@ -16,6 +17,7 @@ const TeamFormation = (props) => {
     console.log('TeamFormation render id ' + players + ',' + props.match.params.gid);
     return (
         <div>
+            <Login/>
             <h1>TeamFormation {props.match.params.gid}</h1>
             <Team playersAvailable={players} handleNewPlayer={handleNewPlayer}/>
             <p/>

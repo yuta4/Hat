@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {Button, Label} from "semantic-ui-react";
+import Login from "./login";
 
 const JoinScreen = (props) => {
 
@@ -20,6 +21,7 @@ const JoinScreen = (props) => {
 
     return (
         <div>
+            <Login/>
             <h1>Join</h1>
             {gamesToJoin.map(game => (
                 <div key={game.gameId}>

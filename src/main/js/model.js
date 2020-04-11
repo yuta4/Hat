@@ -12,7 +12,7 @@ export default {
     game_watchers: [],
     games_to_join: [],
     //thunk
-    requestLogin: thunk(async actions => {
+    requestLogin: thunk((actions) => {
         client({method: 'GET', path: '/game/login'}).done(response => {
             actions.setLogin(response.entity);
         });

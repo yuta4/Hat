@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,8 +38,8 @@ public class GameController {
     }
 
     @GetMapping("login")
-    public String getLogin(Principal principal) {
-        return playerService.getPlayerByLogin(principal.getName()).getLogin();
+    public Set<String> getLogin(Principal principal) {
+        return Collections.singleton(playerService.getPlayerByLogin(principal.getName()).getLogin());
     }
 
     @PostMapping("/create")

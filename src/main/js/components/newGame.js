@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStoreActions } from "easy-peasy";
+import Login from "./login";
 const client = require('../client');
 
 const NewGame = (props) => {
@@ -26,6 +27,7 @@ const NewGame = (props) => {
 
     return (
         <div>
+            <Login/>
             <h1>NewGameScreen</h1>
             <button onClick={createGame}>Create new game</button>
             <button onClick={moveToJoinGameOption}>Join existing one</button>
