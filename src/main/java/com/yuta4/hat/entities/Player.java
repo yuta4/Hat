@@ -30,4 +30,7 @@ public class Player {
     @JsonIgnore
     private Game lastGame;
 
+//    @NonNull
+    //TODO: add login
+
 }

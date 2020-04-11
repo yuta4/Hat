@@ -1,79 +1,59 @@
-import select from 'react-select';
+import React, {useEffect} from 'react';
+import {useStoreState} from "easy-peasy";
+import {Label} from 'semantic-ui-react'
+import Select from 'react-select'
 
-const React = require('react');
-const client = require('../client');
+const TeamFormation = (props) => {
 
-class TeamFormation extends React.Component {
-
-    constructor(props) {
-        console.log("TeamFormation constructor")
-        super(props);
-        this.state = {playersAvailable: []}
-        this.handleNewPlayer = this.handleNewPlayer.bind(this)
-    }
-
-    componentDidMount() {
-        console.log('calling /players')
-        client({method: 'GET', path: '/players'}).done(response => {
-            const items = [];
-            response.entity.map((data, index) => {
-
-                items.push(<option key={index}>{data}</option>);
-            });
-            this.setState({playersAvailable: items});
-        });
-    }
-
-    handleNewPlayer(event) {
+    function handleNewPlayer(event) {
         const selected = event.target.value;
-        // this.setState({playersAvailable: })
     }
 
 
-    render() {
-        console.log('TeamFormation render id ' + this.state.playersAvailable + ',' + this.props.match.params.gid);
-        // const opts = this.state.playersAvailable;
-        return (
-            <div>
-                <h1>TeamFormation {this.props.match.params.gid}</h1>
-                <Team playersAvailable={this.state.playersAvailable} handleNewPlayer={this.handleNewPlayer}/>
-            </div>
-        )
-    }
-}
+    const players = useStoreState(state => state.game_players);
+    const owner = useStoreState(state => state.owner);
 
-class Team extends React.Component {
+    console.log('TeamFormation render id ' + players + ',' + props.match.params.gid);
+    return (
+        <div>
+            <h1>TeamFormation {props.match.params.gid}</h1>
+            <Team playersAvailable={players} handleNewPlayer={handleNewPlayer}/>
+            <Watchers/>
+        </div>
+    )
+    // }
+};
 
-    constructor(props) {
-        super(props);
+const Watchers = () => {
+    const watchers = useStoreState(state => state.game_watchers);
+    const owner = useStoreState(state => state.owner);
 
-    }
+    return (
+        <div>
+            <Label color='red' horizontal>{owner}</Label>
+            {watchers.map(watcher => {
+                <Label color='green' horizontal>{watcher}</Label>
+            })}
+        </div>
+    )
+};
 
-    render() {
-        return (
-            <NewPlayer playersAvailable={this.props.playersAvailable} handleNewPlayer={this.props.handleNewPlayer}/>
-        );
-    }
-}
+const Team = ((props) => {
 
-class Player extends React.Component {
+    return (
+        <NewPlayer playersAvailable={props.playersAvailable} handleNewPlayer={props.handleNewPlayer}/>
+    );
+});
 
-    constructor(props) {
-        super(props);
-        this.state = {email: string}
-    }
+const Player = (() => {
 
-    render() {
 
-    }
-}
+});
 
-class NewPlayer extends React.Component {
+const NewPlayer = ((props) => {
 
-    render() {
-        const opts = this.props.playersAvailable;
-        return <select onClick={event => this.props.handleNewPlayer(event)}>{opts}</select>
-    }
-}
+    const watchers = [...useStoreState(state => state.game_watchers),useStoreState(state => state.owner)];
+    return <Select options={watchers.map(watcher => ({value: watcher, label: watcher}))}/>
+});
 
 export default TeamFormation;

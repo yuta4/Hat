@@ -4,7 +4,7 @@ import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.services.*;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,19 +60,18 @@ public class GameProgressController {
 //        }
 //    }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> getGameProgress(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByEmail(principal.getName());
         Game game = gameService.getGameById(gameId);
-        Set<String> watchersEmails = gameService.getWatchersEmails(gameId);
-        Set<String> players = teamService.getGameTeams(game).stream()
-                .flatMap(team -> team.getPlayers().stream()
-                        .map(Player::getEmail))
+        Set<Player> gamePlayers = teamService.getGamePlayers(game);
+        Set<String> gamePlayersEmails = gamePlayers.stream()
+                .map(Player::getEmail)
                 .collect(Collectors.toSet());
-        requestValidationService.validate(gameId, game);
+        Set<String> watchersEmails = gameService.addAndGetWatchersEmails(gameId, player, gamePlayers);
         return Map.of("path", game.getGameProgress().getPath(gameId),
-                "isOwner", game.getOwner().equals(player),
+                "owner", game.getOwner().getEmail(),
                 "watchers", watchersEmails,
-                "players", players);
+                "players", gamePlayersEmails);
     }
 }

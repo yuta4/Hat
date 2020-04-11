@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TeamService {
@@ -86,5 +87,11 @@ public class TeamService {
 
     public Team getTeamOrThrow(Long teamId) {
         return teamRepository.findById(teamId).orElseThrow(() -> new TeamException("No team with id found : " + teamId));
+    }
+
+    public Set<Player> getGamePlayers(Game game) {
+        return getGameTeams(game).stream()
+                .flatMap(team -> team.getPlayers().stream())
+                .collect(Collectors.toSet());
     }
 }

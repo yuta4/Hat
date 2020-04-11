@@ -1,6 +1,5 @@
 package com.yuta4.hat.services;
 
-import com.yuta4.hat.exceptions.NoSuchPlayerException;
 import com.yuta4.hat.PlayerPrincipal;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
@@ -9,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 public class PlayerService implements UserDetailsService {
@@ -36,14 +33,4 @@ public class PlayerService implements UserDetailsService {
         playerRepository.save(player);
     }
 
-    public Set<Player> getPLayersList(String playerEmails) {
-        String[] emails = playerEmails.split(",");
-        Set<Player> players = new HashSet<>();
-        for(String email : emails) {
-            Player player = playerRepository.findByEmail(email).orElseThrow(() -> new NoSuchPlayerException(email));
-
-            players.add(player);
-        }
-        return players;
-    }
 }
