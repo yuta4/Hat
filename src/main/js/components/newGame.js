@@ -13,7 +13,7 @@ const NewGame = (props) => {
         client({method: 'POST', path: '/game/create'}).done(response => {
             console.log('NewGame ' + response.entity);
             setGameId(response.entity);
-            moveToGameProgressScreen(response.entity, props.history)
+            moveToGameProgressScreen(props.history)
         });
     }
 

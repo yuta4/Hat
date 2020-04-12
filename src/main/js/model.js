@@ -14,7 +14,7 @@ export default {
     //thunk
     requestLogin: thunk((actions) => {
         client({method: 'GET', path: '/game/login'}).done(response => {
-            actions.setLogin(response.entity);
+            actions.setLogin(response.entity.login);
         });
     }),
     moveToGameProgressScreen: thunk((actions, history, helpers) => {

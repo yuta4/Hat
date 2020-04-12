@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,8 +36,9 @@ public class GameController {
     }
 
     @GetMapping("login")
-    public Set<String> getLogin(Principal principal) {
-        return Collections.singleton(playerService.getPlayerByLogin(principal.getName()).getLogin());
+    public Map.Entry<String, String> getLogin(Principal principal) {
+        return new AbstractMap.SimpleEntry<>(
+                        "login", playerService.getPlayerByLogin(principal.getName()).getLogin());
     }
 
     @PostMapping("/create")
@@ -61,21 +60,18 @@ public class GameController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("isOwner")
-    public ResponseEntity<Boolean> isGameOwner(Principal principal) {
+    @PutMapping("unwatch")
+    public ResponseEntity<Boolean> removeWatcher(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
-        Game game = player.getLastGame();
-        if(game != null) {
-            return ResponseEntity.ok().body(game.getOwner().equals(player));
-        }
-        return ResponseEntity.notFound().build();
+        gameService.unwatch(gameId, player);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/finish")
-    public ResponseEntity<Void> finishGame(Principal principal) {
+    public ResponseEntity<Void> finishGame(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
-        Game game = player.getLastGame();
-        gameService.finishGame(game);
+        Game game = gameService.getGameById(gameId);
+        gameService.finishGameIfPermitted(game, player);
         return ResponseEntity.ok().build();
     }
 

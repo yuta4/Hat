@@ -30,7 +30,8 @@ public class Game {
     @Enumerated(EnumType.STRING)
     private GameProgress gameProgress;
 
-    @OneToMany
+    //TODO: should be @OneToMany
+    @ManyToMany
     @JoinTable(name = "game_watcher",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))

@@ -16,7 +16,7 @@ const Start = (props) => {
             moveToGameProgressScreen(props.history);
         }, () => {
             console.log('NewGameScreen');
-            props.history.push({pathname: '/create/'})
+            props.history.push({pathname: '/create'})
         });
     }
 

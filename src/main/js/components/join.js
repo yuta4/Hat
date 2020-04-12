@@ -19,10 +19,15 @@ const JoinScreen = (props) => {
         moveToGameProgressScreen(props.history);
     }
 
+    function toMain() {
+        props.history.push({pathname: '/'});
+    }
+
     return (
         <div>
             <Login/>
             <h1>Join</h1>
+            <Button onClick={() => toMain()}>To main menu</Button>
             {gamesToJoin.map(game => (
                 <div key={game.gameId}>
                     <Button onClick={() => joinGame(game.gameId)}>Join</Button>

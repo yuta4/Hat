@@ -5,6 +5,7 @@ import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.exceptions.GameNotFoundException;
+import com.yuta4.hat.exceptions.RequestValidationException;
 import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,10 @@ public class GameService {
         return gameRepository.save(game);
     }
 
-    public void finishGame(Game game) {
+    public void finishGameIfPermitted(Game game, Player player) {
+        if(!game.getOwner().equals(player)) {
+            throw new RequestValidationException("Only game owner can finish the game");
+        }
         game.setIsActive(false);
         gameRepository.save(game);
     }
@@ -63,5 +67,12 @@ public class GameService {
 
     public Set<Game> getNotStartedGames() {
         return gameRepository.findGamesByIsActiveIsNull();
+    }
+
+    public void unwatch(Long gameId, Player player) {
+        Game game = getGameById(gameId);
+        if(game.getWatchers().remove(player)) {
+            gameRepository.save(game);
+        }
     }
 }

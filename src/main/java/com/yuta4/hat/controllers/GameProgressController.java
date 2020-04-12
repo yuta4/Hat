@@ -60,7 +60,7 @@ public class GameProgressController {
 //        }
 //    }
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping
     public Map<String, Object> getGameProgress(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
