@@ -4,6 +4,7 @@ const client = require('./client');
 export default {
     //state
     login:'',
+    subscriptions: [],
     gid: null,
     owner: '',
     path: '',

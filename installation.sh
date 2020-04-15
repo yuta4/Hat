@@ -1,4 +1,3 @@
-npm install react-router-dom
-npm install react-router-dom
+npm install
 
-sudo npm install -g expo-cli
+webpack

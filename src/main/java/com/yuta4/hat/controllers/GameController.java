@@ -1,6 +1,7 @@
 package com.yuta4.hat.controllers;
 
 import com.yuta4.hat.Level;
+import com.yuta4.hat.components.JoinGamePublisher;
 import com.yuta4.hat.dto.JoinGameDto;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
@@ -8,9 +9,14 @@ import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.entities.Word;
 import com.yuta4.hat.exceptions.NoSuchGameException;
 import com.yuta4.hat.services.*;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.security.Principal;
 import java.util.*;
@@ -18,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/game")
+@Slf4j
 public class GameController {
 
     private GameService gameService;
@@ -25,14 +32,17 @@ public class GameController {
     private WordService wordService;
     private TeamService teamService;
     private GameWordService gameWordService;
+    private Flux<Set<JoinGameDto>> joinGameFlux;
+    private Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(GameService gameService, PlayerService playerService, WordService wordService,
-                          TeamService teamService, GameWordService gameWordService) {
+                          TeamService teamService, GameWordService gameWordService, JoinGamePublisher joinGamePublisher) {
         this.gameService = gameService;
         this.playerService = playerService;
         this.wordService = wordService;
         this.teamService = teamService;
         this.gameWordService = gameWordService;
+        this.joinGameFlux = Flux.create(joinGamePublisher).share();
     }
 
     @GetMapping("login")
@@ -121,6 +131,12 @@ public class GameController {
         return gameService.getNotStartedGames().stream()
                 .map(JoinGameDto::new)
                 .collect(Collectors.toSet());
+    }
+
+    @GetMapping(path = "notStartedEvents", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Set<JoinGameDto>> notStartedEvents() {
+        logger.info("notStartedEvents");
+        return joinGameFlux.log();
     }
 
 }

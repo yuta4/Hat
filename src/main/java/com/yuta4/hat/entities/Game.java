@@ -15,10 +15,10 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<GameWord> words;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     private List<Team> teams;
 
     //null - not started, true - started, false - finished
@@ -31,7 +31,7 @@ public class Game {
     private GameProgress gameProgress;
 
     //TODO: should be @OneToMany
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "game_watcher",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))

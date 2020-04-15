@@ -8,10 +8,16 @@ const JoinScreen = (props) => {
     const gamesToJoin = useStoreState(state => state.games_to_join);
     const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
     const setGameId = useStoreActions(actions => actions.setGameId);
-
+    const setGamesToJoin = useStoreActions(actions => actions.setGamesToJoin);
 
     useEffect(() => {
         console.log('JoinScreen useEffect' + {gamesToJoin});
+        load.start();
+
+        return () => {
+            console.log('JoinScreen useEffect close');
+            load.stop();
+        }
     });
 
     function joinGame(id) {
@@ -21,6 +27,33 @@ const JoinScreen = (props) => {
 
     function toMain() {
         props.history.push({pathname: '/'});
+    }
+
+    const load = new loadGamesToJoin();
+
+    function loadGamesToJoin () {
+
+        this.source = null;
+
+        this.start = function () {
+            console.log('loadGamesToJoin before EventSource')
+            this.source = new EventSource("/game/notStartedEvents");
+            this.source.addEventListener("message", function (event) {
+                console.log('Got update notStartedEvents ' + event);
+                setGamesToJoin(JSON.parse(event.data));
+            });
+
+            this.source.onerror = function (event) {
+                // this.close();
+                console.log('Got update error ' + event);
+            };
+
+        };
+
+        this.stop = function() {
+            this.source.close();
+        }
+
     }
 
     return (

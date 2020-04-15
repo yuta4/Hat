@@ -22,7 +22,10 @@ const NewGame = (props) => {
             console.log('NewGame ' + response.entity);
             setGamesToJoin(response.entity);
             props.history.push({pathname: "/join"});
+        }, () => {
+            console.log('moveToJoinGameOption ex')
         });
+
     }
 
     return (
