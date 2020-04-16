@@ -23,7 +23,7 @@ export default {
         client({method: 'PUT', path: '/progress?gameId=' + gid}).done(response => {
             console.log('moveToGameProgressScreen ' + response.entity + gid);
             actions.setGameProgressFromJson(response.entity);
-            history.push({pathname: response.entity.path})
+            history.push({pathname: response.entity.path, state: response.entity.data})
         }, response => {
             console.log('moveToGameProgressScreen error ' + response.status);
         });

@@ -36,8 +36,13 @@ const JoinScreen = (props) => {
         this.source = null;
 
         this.start = function () {
-            console.log('loadGamesToJoin before EventSource')
+            console.log('loadGamesToJoin before EventSource');
             this.source = new EventSource("/game/notStartedEvents");
+
+            this.source.onmessage = function (event) {
+                console.log('loadGamesToJoin onmessage for debug');
+            };
+
             this.source.addEventListener("message", function (event) {
                 console.log('Got update notStartedEvents ' + event);
                 setGamesToJoin(JSON.parse(event.data));

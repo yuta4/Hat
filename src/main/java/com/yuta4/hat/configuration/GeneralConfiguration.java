@@ -18,7 +18,6 @@ public class GeneralConfiguration {
 
     @Bean
     BlockingQueue<NewGameEvent> queue() {
-        LinkedBlockingQueue<NewGameEvent> newGameEventsQueue = new LinkedBlockingQueue<>();
-        return newGameEventsQueue;
+        return new LinkedBlockingQueue<>();
     }
 }

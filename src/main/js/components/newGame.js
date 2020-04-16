@@ -19,10 +19,10 @@ const NewGame = (props) => {
 
     function moveToJoinGameOption() {
         client({method: 'GET', path: '/game/notStarted'}).done(response => {
-            console.log('NewGame ' + response.entity);
+            console.log('moveToJoinGameOption ' + response.entity);
             setGamesToJoin(response.entity);
             props.history.push({pathname: "/join"});
-        }, () => {
+        }, (response) => {
             console.log('moveToJoinGameOption ex')
         });
 

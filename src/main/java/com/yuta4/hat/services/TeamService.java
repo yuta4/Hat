@@ -94,4 +94,9 @@ public class TeamService {
                 .flatMap(team -> team.getPlayers().stream())
                 .collect(Collectors.toSet());
     }
+
+    public Boolean removePlayerFromTeam(Team team, Player playerToRemoved) {
+        boolean isRemoved = team.getPlayers().remove(playerToRemoved);
+        return isRemoved;
+    }
 }

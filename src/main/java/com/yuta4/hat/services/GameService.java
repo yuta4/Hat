@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class GameService {
@@ -61,15 +60,13 @@ public class GameService {
         return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
     }
 
-    public Set<String> addAndGetWatchersLogin(Long gameID, Player playerToAdd, Set<Player> players) {
-        Game game = getGameById(gameID);
-        if(!game.getOwner().equals(playerToAdd) && !players.contains(playerToAdd)) {
+    public boolean addWatcher(Game game, Player playerToAdd, Set<Player> gamePlayers) {
+        if(!game.getOwner().equals(playerToAdd) && !gamePlayers.contains(playerToAdd)) {
             game.getWatchers().add(playerToAdd);
             gameRepository.save(game);
+            return true;
         }
-        return game.getWatchers().stream()
-                .map(Player::getLogin)
-                .collect(Collectors.toSet());
+        return false;
     }
 
     public Set<Game> getNotStartedGames() {
