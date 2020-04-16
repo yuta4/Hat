@@ -1,13 +1,13 @@
 package com.yuta4.hat.controllers;
 
-import com.yuta4.hat.GameProgress;
+import com.yuta4.hat.components.GameProgressPublisher;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.services.*;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.security.Principal;
 import java.util.Map;
@@ -17,22 +17,20 @@ import java.util.Map;
 public class GameProgressController {
 
     private GameService gameService;
-//    private GameProgressService gameProgressService;
     private PlayerService playerService;
-//    private RequestValidationService requestValidationService;
     private TeamService teamService;
 
+    private Flux<ServerSentEvent<Map<String, Object>>> gameProgressFlux;
+
     public GameProgressController(GameService gameService,
-//                                  GameProgressService gameProgressService,
                                   PlayerService playerService,
-//                                  RequestValidationService requestValidationService,
-                                  TeamService teamService
+                                  TeamService teamService,
+                                  GameProgressPublisher gameProgressPublisher
     ) {
         this.gameService = gameService;
-//        this.gameProgressService = gameProgressService;
         this.playerService = playerService;
-//        this.requestValidationService = requestValidationService;
         this.teamService = teamService;
+        this.gameProgressFlux = Flux.create(gameProgressPublisher).share();
     }
 
 //    @PutMapping("/next")
@@ -66,8 +64,11 @@ public class GameProgressController {
         Player pLayer = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         gameService.addWatcher(game, pLayer, teamService.getGamePlayers(game));
-        GameProgress gameProgress = game.getGameProgress();
-        return Map.of("path", gameProgress.getPath(gameId),
-                "data", gameProgress.getData(game));
+        return game.getGameProgress().getData(game);
+    }
+
+    @GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<Map<String, Object>>> getGameProgressEvents() {
+        return gameProgressFlux.log();
     }
 }

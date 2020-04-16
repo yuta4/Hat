@@ -6,6 +6,7 @@ import com.yuta4.hat.services.GameService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.FluxSink;
@@ -28,7 +29,7 @@ public class JoinGamePublisher implements
     private final BlockingQueue<NewGameEvent> queue;
     private final GameService gameService;
 
-    public JoinGamePublisher(Executor executor, BlockingQueue<NewGameEvent> queue, GameService gameService) {
+    public JoinGamePublisher(@Qualifier("newGamesEventExecutor") Executor executor, BlockingQueue<NewGameEvent> queue, GameService gameService) {
         this.executor = executor;
         this.queue = queue;
         this.gameService = gameService;

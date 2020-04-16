@@ -6,6 +6,8 @@ import com.yuta4.hat.services.GameService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.Map;
 
 public enum GameProgress {
 //    CREATE_GAME("/create"),
@@ -25,22 +27,18 @@ public enum GameProgress {
         GameProgress.teamsScreenDtoConverter = teamsScreenDtoConverter;
     }
 
-    public Object getData(Game game) {
+    public Map<String, Object> getData(Game game) {
         if(this == TEAMS_FORMATION) {
-//            return Map.of(
-//                    "teams", teamsScreenDtoConverter.convert(game)
-//            );
-            return teamsScreenDtoConverter.convert(game);
+            return Map.of(
+                    "path", path,
+                    "data", teamsScreenDtoConverter.convert(game)
+            );
         }
-        return "";
+        return Collections.emptyMap();
     }
 
     GameProgress(String path) {
         this.path = path;
-    }
-
-    public String getPath(Long gameId) {
-        return path + gameId;
     }
 
     @Component
