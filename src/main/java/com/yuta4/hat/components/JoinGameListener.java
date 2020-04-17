@@ -10,20 +10,19 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.BlockingQueue;
 
 @Component
-public class NewGameListener implements ApplicationListener<NewGameEvent>  {
+public class JoinGameListener implements ApplicationListener<NewGameEvent>  {
 
-    Logger logger = LoggerFactory.getLogger(NewGameListener.class);
+    Logger logger = LoggerFactory.getLogger(JoinGameListener.class);
 
     private final BlockingQueue<NewGameEvent> queue;
 
-    public NewGameListener(BlockingQueue<NewGameEvent> queue) {
+    public JoinGameListener(BlockingQueue<NewGameEvent> queue) {
         this.queue = queue;
     }
 
     @Override
     public void onApplicationEvent(@NonNull NewGameEvent newGameEvent) {
         logger.error("NewGameListener onApplicationEvent {}", newGameEvent.getSource());
-        this.queue.clear();
         this.queue.offer(newGameEvent);
     }
 }

@@ -1,22 +1,21 @@
-import React, {useEffect} from "react";
-import {useStoreActions, useStoreState} from "easy-peasy";
+import React, {useEffect, useState} from "react";
+import {useStoreActions} from "easy-peasy";
 import {Button, Label} from "semantic-ui-react";
 import Login from "./login";
 
 const JoinScreen = (props) => {
 
-    const gamesToJoin = useStoreState(state => state.games_to_join);
+    const [gamesToJoin, setGamesToJoin] = useState(props.location.state);
     const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
     const setGameId = useStoreActions(actions => actions.setGameId);
-    const setGamesToJoin = useStoreActions(actions => actions.setGamesToJoin);
 
     useEffect(() => {
         console.log('JoinScreen useEffect' + {gamesToJoin});
-        load.start();
+        gamesToJoinSubscription.start();
 
         return () => {
             console.log('JoinScreen useEffect close');
-            load.stop();
+            gamesToJoinSubscription.stop();
         }
     });
 
@@ -29,18 +28,18 @@ const JoinScreen = (props) => {
         props.history.push({pathname: '/'});
     }
 
-    const load = new loadGamesToJoin();
+    const gamesToJoinSubscription = new gamesToJoinSubscriptionEvent();
 
-    function loadGamesToJoin () {
+    function gamesToJoinSubscriptionEvent () {
 
         this.source = null;
 
         this.start = function () {
-            console.log('loadGamesToJoin before EventSource');
+            console.log('gamesToJoinSubscriptionEvent before EventSource');
             this.source = new EventSource("/game/notStartedEvents");
 
             this.source.onmessage = function (event) {
-                console.log('loadGamesToJoin onmessage for debug');
+                console.log('gamesToJoinSubscriptionEvent onmessage for debug');
             };
 
             this.source.addEventListener("message", function (event) {

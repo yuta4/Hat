@@ -38,8 +38,8 @@ public class TeamController {
     public ResponseEntity<String> createTeam(Principal principal, @RequestParam Long gameId) {
         try {
             Player player = playerService.getPlayerByLogin(principal.getName());
-            Game game = player.getLastGame();
-            requestValidationService.validate(gameId, player, game);
+            Game game = gameService.getGameById(gameId);
+            requestValidationService.validate(player, game);
             return ResponseEntity.ok(teamService.createTeam(game).toString());
         } catch (RequestValidationException | UsernameNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -47,11 +47,15 @@ public class TeamController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteTeam(Principal principal, @RequestParam Long gameId, @RequestParam Long teamId) {
+    public ResponseEntity<String> deleteTeam(Principal principal, @RequestParam Long teamId) {
         try {
             Player player = playerService.getPlayerByLogin(principal.getName());
-            Game game = player.getLastGame();
-            requestValidationService.validate(gameId, player, game);
+            Team team = teamService.getTeamOrThrow(teamId);
+            Game game = team.getGame();
+            requestValidationService.validate(player, game);
+            if(team.getPlayers() != null) {
+                team.getPlayers().forEach(teamPlayer -> gameService.removeWatcher(game.getId(), teamPlayer));
+            }
             return ResponseEntity.ok(teamService.deleteTeam(teamId).toString());
         } catch (UsernameNotFoundException | TeamException | RequestValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -65,8 +69,12 @@ public class TeamController {
             Player player = playerService.getPlayerByLogin(principal.getName());
             Player newTeamPlayer = playerService.getPlayerByLogin(newPlayerLogin);
             Team team = teamService.getTeamOrThrow(teamId);
-            requestValidationService.validateTeamExtension(player, player, team);
-            return ResponseEntity.ok(teamService.addPlayerToTeam(team, newTeamPlayer).toString());
+            requestValidationService.validateTeamExtension(player, newTeamPlayer, team);
+            boolean added = teamService.addPlayerToTeam(team, newTeamPlayer);
+            if(added) {
+                gameService.removeWatcher(team.getGame().getId(), newTeamPlayer);
+            }
+            return ResponseEntity.ok(added + "");
         } catch (UsernameNotFoundException | TeamException | RequestValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

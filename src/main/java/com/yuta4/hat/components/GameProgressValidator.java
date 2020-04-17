@@ -1,28 +1,27 @@
-package com.yuta4.hat.services;
+package com.yuta4.hat.components;
 
 import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
-import com.yuta4.hat.exceptions.GameProgressException;
-import org.springframework.stereotype.Service;
+import com.yuta4.hat.services.TeamService;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class GameProgressService {
+@Component
+public class GameProgressValidator {
 
     private TeamService teamService;
-    private GameService gameService;
 
-    public GameProgressService(TeamService teamService, GameService gameService) {
+    public GameProgressValidator(TeamService teamService) {
         this.teamService = teamService;
-        this.gameService = gameService;
     }
 
-    public void validateAndSaveProgress(Game game, GameProgress requestedProgress) {
+    public String validateRequirements(Game game) {
         Optional<String> errorOptional = Optional.empty();
+        GameProgress requestedProgress = game.getGameProgress();
         switch (requestedProgress) {
             case TEAMS_FORMATION:
                 errorOptional = checkTeamsFormation(game);
@@ -45,32 +44,29 @@ public class GameProgressService {
             default:
                 break;
         }
-        errorOptional.ifPresent(error -> {
-            throw new GameProgressException(requestedProgress, error);
-        } );
-        gameService.saveGameProgress(game, requestedProgress);
+        return errorOptional.orElse("");
     }
 
     private Optional<String> checkTeamsFormation(Game game) {
-        if(game == null) {
-            return Optional.of("Game wasn't created");
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> checkGeneratingWords(Game game) {
         List<Team> gameTeams = teamService.getGameTeams(game);
         if(gameTeams.size() < 2) {
             return Optional.of("At least 2 teams required to generate words for game " + game.getId());
+        }
+        return gameTeams.stream()
+                .filter(team -> team.getPlayers().size() < 2)
+                .map(team -> "At least 2 players need to be present in each team : " + team.getId())
+                .findFirst();
+    }
+
+    private Optional<String> checkGeneratingWords(Game game) {
+        List<GameWord> gameWords = game.getWords();
+        if(gameWords == null || gameWords.isEmpty()) {
+            return Optional.of("There are no words generated for this game");
         }
         return Optional.empty();
     }
 
     private Optional<String> checkFirstRound(Game game) {
-        List<GameWord> gameWords = game.getWords();
-        if(gameWords == null || gameWords.isEmpty()) {
-            return Optional.of("There are no words generated for this game");
-        }
         return Optional.empty();
     }
 

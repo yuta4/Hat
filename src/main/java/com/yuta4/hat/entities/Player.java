@@ -1,6 +1,7 @@
 package com.yuta4.hat.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,6 +29,7 @@ public class Player {
 
     @ManyToOne
     @JsonIgnore
+    @JsonIgnoreProperties("owner")
     private Game lastGame;
 
     @Column(nullable = false, unique = true)

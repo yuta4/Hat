@@ -11,6 +11,7 @@ import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ public class GameService {
         Game game = new Game();
         game.setOwner(player);
         game.setGameProgress(GameProgress.TEAMS_FORMATION);
+        game.setWatchers(Collections.singleton(player));
         gameRepository.save(game);
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
         return game;
@@ -61,8 +63,18 @@ public class GameService {
     }
 
     public boolean addWatcher(Game game, Player playerToAdd, Set<Player> gamePlayers) {
-        if(!game.getOwner().equals(playerToAdd) && !gamePlayers.contains(playerToAdd)) {
+        if(!gamePlayers.contains(playerToAdd)) {
             game.getWatchers().add(playerToAdd);
+            gameRepository.save(game);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeWatcher(Long gameId, Player playerToRemove) {
+        Game game = getGameById(gameId);
+        if(game.getWatchers().contains(playerToRemove)) {
+            game.getWatchers().remove(playerToRemove);
             gameRepository.save(game);
             return true;
         }
@@ -71,12 +83,5 @@ public class GameService {
 
     public Set<Game> getNotStartedGames() {
         return gameRepository.findGamesByIsActiveIsNull();
-    }
-
-    public void unwatch(Long gameId, Player player) {
-        Game game = getGameById(gameId);
-        if(game.getWatchers().remove(player)) {
-            gameRepository.save(game);
-        }
     }
 }

@@ -64,7 +64,8 @@ public class GameController {
     public ResponseEntity<Long> getActiveGame(Principal principal) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = player.getLastGame();
-        if(game != null && !Boolean.FALSE.equals(game.getIsActive())) {
+        if(game != null && !Boolean.FALSE.equals(game.getIsActive()) &&
+                (game.getOwner().equals(player) || teamService.getGamePlayers(game).contains(player))) {
             return ResponseEntity.ok().body(game.getId());
         }
         return ResponseEntity.notFound().build();
@@ -73,7 +74,7 @@ public class GameController {
     @PutMapping("unwatch")
     public ResponseEntity<Boolean> removeWatcher(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
-        gameService.unwatch(gameId, player);
+        gameService.removeWatcher(gameId, player);
         return ResponseEntity.ok().build();
     }
 

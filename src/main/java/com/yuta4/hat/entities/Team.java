@@ -1,12 +1,15 @@
 package com.yuta4.hat.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
 @Data
+@ToString(of = {"id", "players"})
 public class Team {
 
     @Id
@@ -14,9 +17,10 @@ public class Team {
     private Long id;
 
     @ManyToOne
+    @JsonIgnoreProperties("teams")
     private Game game;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "team_players",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))

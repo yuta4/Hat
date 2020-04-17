@@ -4,14 +4,9 @@ const client = require('./client');
 export default {
     //state
     login:'',
-    subscriptions: [],
     gid: null,
     owner: '',
     path: '',
-    path_data: [],
-    game_players: [],
-    game_watchers: [],
-    games_to_join: [],
     //thunk
     requestLogin: thunk((actions) => {
         client({method: 'GET', path: '/game/login'}).done(response => {
@@ -22,25 +17,22 @@ export default {
         const gid = helpers.getStoreState().gid;
         client({method: 'PUT', path: '/progress?gameId=' + gid}).done(response => {
             console.log('moveToGameProgressScreen ' + response.entity + gid);
-            actions.setGameProgressFromJson(response.entity);
-            history.push({pathname: response.entity.path, state: response.entity.data})
+            history.push({pathname: response.entity.path, state: response.entity})
         }, response => {
             console.log('moveToGameProgressScreen error ' + response.status);
+        });
+    }),
+    moveToJoinGameOption: thunk((actions, history) => {
+        client({method: 'GET', path: '/game/notStarted'}).done(response => {
+            console.log('moveToJoinGameOption ' + response.entity);
+            history.push({pathname: "/join", state: response.entity});
+        }, (response) => {
+            console.log('moveToJoinGameOption ex')
         });
     }),
     //action
     setGameId: action((state, id) => {
         state.gid = id
-    }),
-    setGameProgressFromJson: action((state, entity) => {
-        state.owner = entity.owner;
-        state.path = entity.path;
-        state.path_data = entity.path_data !== undefined ? entity.path_data : [];
-        state.game_players = entity.players !== undefined ? entity.players : [];
-        state.game_watchers = entity.watchers !== undefined ? entity.watchers : [];
-    }),
-    setGamesToJoin: action((state, games) => {
-        state.games_to_join = games !== undefined ? games : [];
     }),
     setLogin: action((state, login) => {
        state.login = login;

@@ -1,8 +1,10 @@
 package com.yuta4.hat.services;
 
+import com.yuta4.hat.components.GameProgressListener;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
+import com.yuta4.hat.events.GameProgressEvent;
 import com.yuta4.hat.exceptions.TeamException;
 import com.yuta4.hat.repositories.TeamRepository;
 import org.springframework.stereotype.Service;
@@ -17,16 +19,20 @@ public class TeamService {
 
     private TeamRepository teamRepository;
     private PlayerService playerService;
+    private GameProgressListener gameProgressListener;
 
-    public TeamService(TeamRepository teamRepository, PlayerService playerService) {
+    public TeamService(TeamRepository teamRepository, PlayerService playerService, GameProgressListener gameProgressListener) {
         this.teamRepository = teamRepository;
         this.playerService = playerService;
+        this.gameProgressListener = gameProgressListener;
     }
 
     public Long createTeam(Game game) {
         Team team = new Team();
         team.setGame(game);
-        return teamRepository.save(team).getId();
+        Long teamId = teamRepository.save(team).getId();
+        gameProgressListener.onApplicationEvent(new GameProgressEvent(game));
+        return teamId;
     }
 
     public Boolean addPlayerToTeam(Team team, Player newPlayer) {
@@ -97,6 +103,7 @@ public class TeamService {
 
     public Boolean removePlayerFromTeam(Team team, Player playerToRemoved) {
         boolean isRemoved = team.getPlayers().remove(playerToRemoved);
+        teamRepository.save(team);
         return isRemoved;
     }
 }

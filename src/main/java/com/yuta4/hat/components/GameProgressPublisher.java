@@ -34,16 +34,16 @@ public class GameProgressPublisher implements
 
     @Override
     public void accept(FluxSink<ServerSentEvent<Map<String, Object>>> sink) {
-        logger.error("Join game publisher accepted");
+        logger.error("GameProgress publisher accepted");
         this.executor.execute(() -> {
             while (true)
                 try {
-                    logger.error("Join game publisher before taking");
+                    logger.error("GameProgress publisher before taking");
                     Game game = (Game) queue.take().getSource();
-                    logger.error("Join game publisher took");
+                    logger.error("GameProgress publisher took " + game.getId());
                     sink.next(ServerSentEvent.<Map<String, Object>>builder()
                             .id(LocalDateTime.now().toString())
-                            .event(game.getId().toString())
+                            .event("gameProgress " + game.getId())
                             .data(game.getGameProgress().getData(game))
                             .build());
                 } catch (InterruptedException e) {
