@@ -8,7 +8,7 @@ import model from "./model"
 import React from 'react';
 
 const ReactDOM = require('react-dom');
-const client = require('./client');
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const store = createStore(model);
 

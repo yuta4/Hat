@@ -82,6 +82,6 @@ public class GameService {
     }
 
     public Set<Game> getNotStartedGames() {
-        return gameRepository.findGamesByIsActiveIsNull();
+        return gameRepository.findGamesByIsActiveIsNullOrderByIdDesc();
     }
 }

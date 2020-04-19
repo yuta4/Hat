@@ -71,10 +71,16 @@ public class GameController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("unwatch")
-    public ResponseEntity<Boolean> removeWatcher(Principal principal, @RequestParam Long gameId) {
+    @PutMapping("changeWatcher")
+    public ResponseEntity<Boolean> removeWatcher(Principal principal, @RequestParam Long gameId,
+                                                 @RequestParam boolean value) {
         Player player = playerService.getPlayerByLogin(principal.getName());
-        gameService.removeWatcher(gameId, player);
+        if(value) {
+            Game game = gameService.getGameById(gameId);
+            gameService.addWatcher(game, player, teamService.getGamePlayers(game));
+        } else {
+            gameService.removeWatcher(gameId, player);
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -131,7 +137,7 @@ public class GameController {
     public Set<JoinGameDto> getNotStartedGames() {
         return gameService.getNotStartedGames().stream()
                 .map(JoinGameDto::new)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @GetMapping(path = "notStartedEvents", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

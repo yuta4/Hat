@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {Button, Label} from 'semantic-ui-react'
+import {Label} from 'semantic-ui-react'
+import {Badge, Button, Col, Container, Row} from 'react-bootstrap'
 import Select from 'react-select'
 import Login from "./login";
 
@@ -17,6 +18,12 @@ const TeamFormation = (props) => {
     const moveToJoinGameOption = useStoreActions(actions => actions.moveToJoinGameOption);
     const isValidationPassed = validation.trim() === "";
 
+    const isPlayer = teams.flatMap(team => team.players).includes(login);
+    const isWatcher = watchers.includes(login);
+    const isOwner = owner === login;
+
+    console.log('TeamFormation init isPlayer ' + isPlayer + ' isWatcher ' + isWatcher + ' isOwner ' + isOwner);
+
     const gameProgressSubscription = new gameProgressSubscriptionEvent();
 
     function gameProgressSubscriptionEvent() {
@@ -24,16 +31,16 @@ const TeamFormation = (props) => {
         this.source = null;
 
         this.start = function () {
-            console.log('gameProgressSubscriptionEvent before EventSource');
+            console.log('gameProgressSubscriptionEvent start');
             this.source = new EventSource("/progress/events");
 
-            this.source.onmessage = function (event) {
-                console.log('gameProgressSubscriptionEvent onmessage for debug');
-            };
+            // this.source.onmessage = function (event) {
+            //     // console.log('gameProgressSubscriptionEvent onmessage for debug');
+            // };
 
             this.source.addEventListener("gameProgress " + gid, function (event) {
-                console.log('Got update gameProgressSubscriptionEvent ' + event);
                 let eventJson = JSON.parse(event.data);
+                console.log('Got update gameProgressSubscriptionEvent ' + eventJson);
                 setOwner(eventJson.data.owner);
                 setTeams(eventJson.data.teams);
                 setWatchers(eventJson.data.watchers);
@@ -48,14 +55,11 @@ const TeamFormation = (props) => {
         };
 
         this.stop = function () {
+            console.log('gameProgressSubscriptionEvent stop');
             this.source.close();
         };
 
     }
-
-    // const isPlayer = checkPlayer(login);
-    const isWatcher = watchers.includes(login);
-    const isOwner = owner === login;
 
     useEffect(() => {
         gameProgressSubscription.start();
@@ -67,15 +71,18 @@ const TeamFormation = (props) => {
 
     useEffect(() => {
         console.log("TeamFormation useEffect");
-        return () => {
-            if (isWatcher && !isOwner) {
-                console.log("leaveTeamFormation");
-                client({method: 'PUT', path: '/game/unwatch?gameId=' + gid}).done(response => {
-                    console.log("unwatched");
-                });
-            }
-        };
-    });
+        client({method: 'PUT', path: '/game/changeWatcher?value=' + !isPlayer + '&gameId=' + gid}).done(response => {
+            console.log("TeamFormation useEffect changeWatcher " + !isPlayer);
+        });
+        // return () => {
+        //     if (isWatcher) {
+        //         console.log("leaveTeamFormation");
+        //         client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
+        //             console.log("useEffect clear");
+        //         });
+        //     }
+        // };
+    }, [isPlayer]);
 
     function closeGame() {
         client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
@@ -100,13 +107,20 @@ const TeamFormation = (props) => {
             <h1>TeamFormation: game {gid}, owner {owner}</h1>
             {
                 (isWatcher && !isOwner) &&
-                <Button onClick={() => moveToJoinGameOption(props.history)}>Back to join</Button>
+                <Button onClick={() => {
+                    console.log("TeamFormation clear effect isWatcher " + isWatcher);
+                    client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
+                        console.log("TeamFormation useEffect clear changeWatcher = false");
+                        moveToJoinGameOption(props.history)
+                    });
+
+                }}>Back to join</Button>
                 // &&
                 // <p/>
             }
             {
                 isOwner &&
-                <Button onClick={closeGame}>Close game</Button>
+                <Button variant="danger" onClick={closeGame}>Close game</Button>
                 // &&
                 // <p/>
             }
@@ -169,7 +183,7 @@ const Team = ((props) => {
             <h2>Team {team.name}</h2>
             {
                 isOwner &&
-                <Button onClick={deleteTeam}>X</Button>
+                <Button variant="outline-danger" onClick={deleteTeam}>X</Button>
             }
             {
                 team.players.map(playerName =>
@@ -205,17 +219,19 @@ const Player = ((props) => {
     }
 
     return (
-        <div>
-            <h3>{name}</h3>
-            {
-                isPlayer &&
-                <Button onClick={leaveTeam}>Leave team</Button>
-            }
-            {
-                (!isPlayer && isOwner) &&
-                <Button onClick={leaveTeam}>X</Button>
-            }
-        </div>
+        <Container>
+            <Row>
+                <Col><Badge variant="success">{name}</Badge></Col>
+                {
+                    isPlayer &&
+                    <Col><Button variant="outline-danger" onClick={leaveTeam}>Leave team</Button></Col>
+                }
+                {
+                    (!isPlayer && isOwner) &&
+                    <Col><Button variant="outline-danger" onClick={leaveTeam}>X</Button></Col>
+                }
+            </Row>
+        </Container>
     )
 
 });

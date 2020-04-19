@@ -61,9 +61,9 @@ public class GameProgressController {
 
     @PutMapping
     public Map<String, Object> getGameProgress(Principal principal, @RequestParam Long gameId) {
-        Player pLayer = playerService.getPlayerByLogin(principal.getName());
+//        Player pLayer = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
-        gameService.addWatcher(game, pLayer, teamService.getGamePlayers(game));
+//        gameService.addWatcher(game, pLayer, teamService.getGamePlayers(game));
         return game.getGameProgress().getData(game);
     }
 
