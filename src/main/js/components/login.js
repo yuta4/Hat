@@ -1,13 +1,15 @@
 import {useStoreState} from "easy-peasy";
-import {Label} from "semantic-ui-react";
 import React from "react";
+import {Col, Row} from "react-bootstrap";
 
 const Login = () => {
 
     const login = useStoreState(state => state.login);
 
     return (
-        <Label color='blue' horizontal>{login}</Label>
+        <Row className="float-right">
+            <Col>{login}</Col>
+        </Row>
     )
 };
 

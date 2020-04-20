@@ -2,19 +2,24 @@ package com.yuta4.hat.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Data
 @ToString(of = {"id", "players"})
+@EqualsAndHashCode(of = {"id"})
 public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    private String name;
 
     @ManyToOne
     @JsonIgnoreProperties("teams")
@@ -24,7 +29,8 @@ public class Team {
     @JoinTable(name = "team_players",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))
-    private Set<Player> players;
+    @OrderBy("login")
+    private Set<Player> players = new LinkedHashSet<>();
 
     @ManyToOne
     private Player playerTurn;

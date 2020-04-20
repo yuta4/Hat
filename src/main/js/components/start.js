@@ -1,6 +1,7 @@
 import  React, {useEffect} from "react";
 import { useStoreActions } from "easy-peasy";
 import Login from "./login";
+import {Spinner, Button} from 'react-bootstrap'
 const client = require('../client');
 
 const Start = (props) => {
@@ -29,7 +30,16 @@ const Start = (props) => {
     return (
         <div>
             <Login/>
-            <h1>Loading..</h1>
+            <Button variant="primary" disabled>
+                <Spinner
+                    as="span"
+                    animation="grow"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                />
+                Loading...
+            </Button>
         </div>
     )
 };

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,9 +22,10 @@ public class Game {
     @OneToMany(mappedBy = "game", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<GameWord> words;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JsonIgnoreProperties("game")
-    private List<Team> teams;
+    @OrderBy("id desc")
+    private Set<Team> teams = new LinkedHashSet<>();
 
     //null - not started, true - started, false - finished
     private Boolean isActive;
@@ -40,7 +42,8 @@ public class Game {
     @JoinTable(name = "game_watcher",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))
-    private Set<Player> watchers;
+    @OrderBy("login")
+    private Set<Player> watchers = new LinkedHashSet<>();
 
     @OneToOne
     private Team teamTurn;

@@ -23,8 +23,17 @@ const TeamFormation = (props) => {
     const isOwner = owner === login;
 
     console.log('TeamFormation init isPlayer ' + isPlayer + ' isWatcher ' + isWatcher + ' isOwner ' + isOwner);
+    console.log('TeamFormation init owner ' + owner + ' teams ' + JSON.stringify(teams) + ' watchers ' + watchers);
+    console.log('TeamFormation init validation ' + validation + ' login ' + login + ' gid ' + gid);
 
     const gameProgressSubscription = new gameProgressSubscriptionEvent();
+
+    function setTeamFormationData(eventJson) {
+        setOwner(eventJson.data.owner);
+        setTeams(eventJson.data.teams);
+        setWatchers(eventJson.data.watchers);
+        setValidation(eventJson.validation);
+    }
 
     function gameProgressSubscriptionEvent() {
 
@@ -40,11 +49,8 @@ const TeamFormation = (props) => {
 
             this.source.addEventListener("gameProgress " + gid, function (event) {
                 let eventJson = JSON.parse(event.data);
-                console.log('Got update gameProgressSubscriptionEvent ' + eventJson);
-                setOwner(eventJson.data.owner);
-                setTeams(eventJson.data.teams);
-                setWatchers(eventJson.data.watchers);
-                setValidation(eventJson.validation);
+                console.log('Got update ' + event.lastEventId + ' gameProgressSubscriptionEvent ' + JSON.stringify(eventJson));
+                setTeamFormationData(eventJson);
             });
 
             this.source.onerror = function (event) {
@@ -102,7 +108,7 @@ const TeamFormation = (props) => {
     }
 
     return (
-        <div>
+        <Container>
             <Login/>
             <h1>TeamFormation: game {gid}, owner {owner}</h1>
             {
@@ -145,13 +151,12 @@ const TeamFormation = (props) => {
                 (isOwner && !isValidationPassed) &&
                 <Label>{validation}</Label>
             }
-        </div>
+        </Container>
     )
 };
 
 const Watchers = (props) => {
     const watchers = props.watchers;
-    const owner = props.owner;
 
     return (
         <div>

@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -52,8 +53,18 @@ public class GameService {
 
     public void moveTeamTurn(Game game) {
         Team team = game.getTeamTurn();
-        List<Team> teams = game.getTeams();
-        Team nextTeam = teams.indexOf(team) + 1 < teams.size() ? teams.get(teams.indexOf(team) + 1) : teams.get(0);
+        Set<Team> teams = game.getTeams();
+        Iterator<Team> teamIterator = teams.iterator();
+        Team firstTeam = teamIterator.next();
+        Team nextTeam = firstTeam;
+        while (nextTeam != team) {
+            nextTeam = teamIterator.next();
+        }
+        if(teamIterator.hasNext()) {
+            nextTeam = teamIterator.next();
+        } else {
+            nextTeam = firstTeam;
+        }
         game.setTeamTurn(nextTeam);
         gameRepository.save(game);
     }
@@ -83,5 +94,16 @@ public class GameService {
 
     public Set<Game> getNotStartedGames() {
         return gameRepository.findGamesByIsActiveIsNullOrderByIdDesc();
+    }
+
+    public void addTeam(Game game, Team newTeam) {
+        game.getTeams().add(newTeam);
+        gameRepository.save(game);
+    }
+
+    public void deleteTeam(Team teamToDelete) {
+        Game game = teamToDelete.getGame();
+        game.getTeams().remove(teamToDelete);
+        gameRepository.save(game);
     }
 }
