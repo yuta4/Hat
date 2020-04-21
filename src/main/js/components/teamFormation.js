@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions, useStoreState} from "easy-peasy";
-import {Label} from 'semantic-ui-react'
-import {Badge, Button, Col, Container, Row} from 'react-bootstrap'
+import {Button, Header, Icon, Item, Label, List, Message, Segment, Divider} from 'semantic-ui-react'
 import Select from 'react-select'
 import Login from "./login";
 
@@ -43,10 +42,6 @@ const TeamFormation = (props) => {
             console.log('gameProgressSubscriptionEvent start');
             this.source = new EventSource("/progress/events");
 
-            // this.source.onmessage = function (event) {
-            //     // console.log('gameProgressSubscriptionEvent onmessage for debug');
-            // };
-
             this.source.addEventListener("gameProgress " + gid, function (event) {
                 let eventJson = JSON.parse(event.data);
                 console.log('Got update ' + event.lastEventId + ' gameProgressSubscriptionEvent ' + JSON.stringify(eventJson));
@@ -80,14 +75,6 @@ const TeamFormation = (props) => {
         client({method: 'PUT', path: '/game/changeWatcher?value=' + !isPlayer + '&gameId=' + gid}).done(response => {
             console.log("TeamFormation useEffect changeWatcher " + !isPlayer);
         });
-        // return () => {
-        //     if (isWatcher) {
-        //         console.log("leaveTeamFormation");
-        //         client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
-        //             console.log("useEffect clear");
-        //         });
-        //     }
-        // };
     }, [isPlayer]);
 
     function closeGame() {
@@ -108,63 +95,84 @@ const TeamFormation = (props) => {
     }
 
     return (
-        <Container>
-            <Login/>
-            <h1>TeamFormation: game {gid}, owner {owner}</h1>
+        <div>
+            <Segment clearing secondary>
+                <Login/>
+                <Header as='h1' icon textAlign='center'>
+                    <Icon name='users' color={"olive"} circular/>
+                    <Header.Content>TeamFormation</Header.Content>
+                </Header>
+                <Header as='h2' floated='right'>
+                    {owner}
+                    <Icon name='spy'/>
+                </Header>
+                <Header as='h2' floated='left'>
+                    <Icon color={"blue"} name='game'/>
+                    {gid}
+                </Header>
+            </Segment>
             {
                 (isWatcher && !isOwner) &&
                 <Button onClick={() => {
-                    console.log("TeamFormation clear effect isWatcher " + isWatcher);
+                    console.log("TeamFormation isWatcher = false, moveToJoinGameOption");
                     client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
                         console.log("TeamFormation useEffect clear changeWatcher = false");
                         moveToJoinGameOption(props.history)
                     });
 
                 }}>Back to join</Button>
-                // &&
-                // <p/>
-            }
-            {
-                isOwner &&
-                <Button variant="danger" onClick={closeGame}>Close game</Button>
-                // &&
-                // <p/>
             }
             {
                 isOwner &&
                 <Button onClick={createTeam}>Create new team</Button>
-                // &&
-                // <p/>
             }
             {
                 teams.map(t =>
                     <Team key={t.id} team={t} isOwner={isOwner} login={login} possiblePlayers={watchers}/>
                 )
             }
-            <Watchers owner={owner} watchers={watchers}/>
-            <p/>
+            <Watchers watchers={watchers} login={login}/>
+            <Divider />
             {
                 isOwner &&
-                <Button disabled={!isValidationPassed} onClick={nextScreen}>Next</Button>
+                <Segment vertical>
+                    {
+                        !isValidationPassed &&
+                        <Label basic color='red' pointing='right' ribbon>{validation}</Label>
+                    }
+                    <Button  onClick={nextScreen} floated={"right"}>Next</Button>
+                    <Divider />
+                </Segment>
             }
             {
-                (isOwner && !isValidationPassed) &&
-                <Label>{validation}</Label>
+                isOwner &&
+                <Button color="red" onClick={closeGame} floated={"right"}>Close game</Button>
             }
-        </Container>
+        </div>
     )
 };
 
 const Watchers = (props) => {
     const watchers = props.watchers;
+    const login = props.login;
 
     return (
-        <div>
-            <p/>
+        <List animated verticalAlign='middle'>
             {watchers.map(watcher => (
-                <Label color='green' key={watcher} horizontal>{watcher}</Label>
+                <List.Item key={watcher}>
+                    <List.Content>
+                        {
+                            watcher === login &&
+                            <Label tag color='teal'>{watcher}</Label>
+                        }
+                        {
+                            watcher !== login &&
+                            <Label tag color='green'>{watcher}</Label>
+                        }
+                    </List.Content>
+                </List.Item>
             ))}
-        </div>
+        </List>
     )
 };
 
@@ -183,62 +191,51 @@ const Team = ((props) => {
         });
     }
 
+    function leaveTeam(playerName) {
+        client({
+            method: 'PUT',
+            path: '/team/reduce?playerLogin=' + playerName + '&teamId=' + team.id + '&moveToWatchers=true'
+        }).done(() => {
+            console.log("team reduced");
+        });
+    }
+
     return (
-        <div>
-            <h2>Team {team.name}</h2>
-            {
-                isOwner &&
-                <Button variant="outline-danger" onClick={deleteTeam}>X</Button>
-            }
-            {
-                team.players.map(playerName =>
-                    <Player key={playerName} isOwner={isOwner} name={playerName} login={login}
-                            teamId={team.id}/>
-                )
-            }
+        <Message>
+            <Header block as='h2'>
+                <Item>
+                    <Icon color={"violet"} name='address card'/>
+                    Team {team.name}
+                    {
+                        isOwner &&
+                        <Button color={"red"} floated={"right"} icon={'remove circle'} onClick={deleteTeam}/>
+                    }
+                </Item>
+            </Header>
+            <List divided verticalAlign='middle'>
+                {
+                    team.players.map(playerName =>
+                        <List.Item key={playerName} as={'h3'}>
+                            {
+                                (isOwner || playerName === login) &&
+                                <List.Content floated='right'>
+                                    <Button color={"red"} icon={'user delete'} onClick={() => leaveTeam(playerName)}/>
+                                </List.Content>
+                            }
+                            <List.Content>
+                                {playerName}
+                            </List.Content>
+
+                        </List.Item>
+                    )
+                }
+            </List>
             {
                 isOwner &&
                 <NewPlayer possiblePlayers={possiblePlayers} teamId={team.id}/>
             }
-        </div>
+        </Message>
     );
-});
-
-const Player = ((props) => {
-
-    const login = props.login;
-    const name = props.name;
-    const teamId = props.teamId;
-    const isOwner = props.isOwner;
-    const isPlayer = name === login;
-
-    function leaveTeam() {
-        client({
-            method: 'PUT',
-            path: '/team/reduce?playerLogin=' + login + '&teamId=' + teamId + '&moveToWatchers=true'
-        }).done(() => {
-            console.log("team reduced");
-            // props.history.push({pathname: '/'});
-        });
-
-    }
-
-    return (
-        <Container>
-            <Row>
-                <Col><Badge variant="success">{name}</Badge></Col>
-                {
-                    isPlayer &&
-                    <Col><Button variant="outline-danger" onClick={leaveTeam}>Leave team</Button></Col>
-                }
-                {
-                    (!isPlayer && isOwner) &&
-                    <Col><Button variant="outline-danger" onClick={leaveTeam}>X</Button></Col>
-                }
-            </Row>
-        </Container>
-    )
-
 });
 
 const NewPlayer = ((props) => {

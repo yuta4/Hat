@@ -22,7 +22,7 @@ public class Game {
     @OneToMany(mappedBy = "game", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<GameWord> words;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnoreProperties("game")
     @OrderBy("id desc")
     private Set<Team> teams = new LinkedHashSet<>();
