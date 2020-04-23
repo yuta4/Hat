@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
 import {Button, Label} from "semantic-ui-react";
 import Login from "./login";
+import SSESubscription from "../sseSubscription";
 
 const JoinScreen = (props) => {
 
@@ -28,37 +29,7 @@ const JoinScreen = (props) => {
         props.history.push({pathname: '/'});
     }
 
-    const gamesToJoinSubscription = new gamesToJoinSubscriptionEvent();
-
-    function gamesToJoinSubscriptionEvent () {
-
-        this.source = null;
-
-        this.start = function () {
-            console.log('gamesToJoinSubscriptionEvent before EventSource');
-            this.source = new EventSource("/game/notStartedEvents");
-
-            this.source.onmessage = function (event) {
-                console.log('gamesToJoinSubscriptionEvent onmessage for debug');
-            };
-
-            this.source.addEventListener("message", function (event) {
-                console.log('Got update notStartedEvents ' + event);
-                setGamesToJoin(JSON.parse(event.data));
-            });
-
-            this.source.onerror = function (event) {
-                // this.close();
-                console.log('Got update error ' + event);
-            };
-
-        };
-
-        this.stop = function() {
-            this.source.close();
-        }
-
-    }
+    const gamesToJoinSubscription = new SSESubscription("/game/notStartedEvents", "message", setGamesToJoin);
 
     return (
         <div>

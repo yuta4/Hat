@@ -3,8 +3,9 @@ import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Button, Divider, Header, Icon, Item, Label, List, Message, Segment} from 'semantic-ui-react'
 import Select from 'react-select'
 import Login from './login';
-import ScreenHeader from "./screenHeader";
-import OwnerControls from "./ownerControls";
+import ScreenHeader from './screenHeader';
+import OwnerControls from './ownerControls';
+import SSESubscription from '../sseSubscription'
 
 const client = require('../client');
 
@@ -27,41 +28,13 @@ const TeamFormation = (props) => {
     console.log('TeamFormation init owner ' + owner + ' teams ' + JSON.stringify(teams) + ' watchers ' + watchers);
     console.log('TeamFormation init validation ' + validation + ' login ' + login + ' gid ' + gid);
 
-    const gameProgressSubscription = new gameProgressSubscriptionEvent();
+    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid, setTeamFormationData);
 
     function setTeamFormationData(eventJson) {
         setOwner(eventJson.data.owner);
         setTeams(eventJson.data.teams);
         setWatchers(eventJson.data.watchers);
         setValidation(eventJson.validation);
-    }
-
-    function gameProgressSubscriptionEvent() {
-
-        this.source = null;
-
-        this.start = function () {
-            console.log('gameProgressSubscriptionEvent start');
-            this.source = new EventSource('/progress/events');
-
-            this.source.addEventListener('gameProgress ' + gid, function (event) {
-                let eventJson = JSON.parse(event.data);
-                console.log('Got update ' + event.lastEventId + ' gameProgressSubscriptionEvent ' + JSON.stringify(eventJson));
-                setTeamFormationData(eventJson);
-            });
-
-            this.source.onerror = function (event) {
-                // this.close();
-                console.log('Got update error ' + event);
-            };
-
-        };
-
-        this.stop = function () {
-            console.log('gameProgressSubscriptionEvent stop');
-            this.source.close();
-        };
-
     }
 
     useEffect(() => {
