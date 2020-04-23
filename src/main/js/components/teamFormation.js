@@ -3,6 +3,8 @@ import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Button, Divider, Header, Icon, Item, Label, List, Message, Segment} from 'semantic-ui-react'
 import Select from 'react-select'
 import Login from './login';
+import ScreenHeader from "./screenHeader";
+import OwnerControls from "./ownerControls";
 
 const client = require('../client');
 
@@ -94,26 +96,31 @@ const TeamFormation = (props) => {
 
     }
 
+    function prevScreen() {
+
+    }
+
     return (
         <div>
-            <Segment clearing secondary>
-                <Login/>
-                <Header as='h1' icon textAlign='center'>
-                    <Icon name='users' color={'olive'} circular/>
-                    <Header.Content>TeamFormation</Header.Content>
-                </Header>
-                <Header as='h2' floated='right'>
-                    {owner}
-                    <Icon name='spy'/>
-                </Header>
-                <Header as='h2' floated='left'>
-                    <Icon color={'blue'} name='game'/>
-                    {gid}
-                </Header>
-            </Segment>
+            <ScreenHeader iconName='users' iconColor='olive'
+                          headerName='Team formation' owner={owner} gid={gid}/>
+            {
+                isOwner &&
+                <Button inverted color='violet' onClick={createTeam}>
+                    <Icon name={'plus'}/>
+                    Create new team
+                </Button>
+            }
+            {
+                teams.map(t =>
+                    <Team key={t.id} team={t} isOwner={isOwner} login={login} possiblePlayers={watchers}/>
+                )
+            }
+            <Watchers watchers={watchers} login={login}/>
+            <Divider/>
             {
                 (isWatcher && !isOwner) &&
-                <Button onClick={() => {
+                <Button inverted color='red' onClick={() => {
                     console.log('TeamFormation isWatcher = false, moveToJoinGameOption');
                     client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
                         console.log('TeamFormation useEffect clear changeWatcher = false');
@@ -124,31 +131,8 @@ const TeamFormation = (props) => {
             }
             {
                 isOwner &&
-                <Button onClick={createTeam}>Create new team</Button>
-            }
-            {
-                teams.map(t =>
-                    <Team key={t.id} team={t} isOwner={isOwner} login={login} possiblePlayers={watchers}/>
-                )
-            }
-            <Watchers watchers={watchers} login={login}/>
-            <Divider/>
-            {
-                isOwner &&
-                <List>
-                    <List.Item>
-                        <Segment basic>
-                            {
-                                !isValidationPassed &&
-                                <Label basic color='red' pointing='below' attached={'top right'}>{validation}</Label>
-                            }
-                            <Button onClick={nextScreen} floated={'right'}>Next</Button>
-                        </Segment>
-                    </List.Item>
-                    <List.Item>
-                        <Button color='red' onClick={closeGame}>Close game</Button>
-                    </List.Item>
-                </List>
+                <OwnerControls validation={validation} prevScreen={prevScreen} nextScreen={nextScreen}
+                               closeGame={closeGame}/>
             }
         </div>
     )
@@ -169,7 +153,7 @@ const Watchers = (props) => {
                         }
                         {
                             watcher !== login &&
-                            <Label tag color='green'>{watcher}</Label>
+                            <Label tag color='yellow'>{watcher}</Label>
                         }
                     </List.Content>
                 </List.Item>
