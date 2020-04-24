@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -46,9 +45,13 @@ public class GameService {
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
     }
 
-    public void saveGameProgress(Game game, GameProgress gameProgress) {
-        game.setGameProgress(gameProgress);
-        gameRepository.save(game);
+    public boolean saveGameProgress(Player player, Game game, GameProgress gameProgress) {
+        if(game.getOwner().equals(player)) {
+            game.setGameProgress(gameProgress);
+            gameRepository.save(game);
+            return true;
+        }
+        return false;
     }
 
     public void moveTeamTurn(Game game) {

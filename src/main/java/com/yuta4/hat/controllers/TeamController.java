@@ -73,9 +73,6 @@ public class TeamController {
             Team team = teamService.getTeamOrThrow(teamId);
             requestValidationService.validateTeamExtension(player, newTeamPlayer, team);
             boolean added = teamService.addPlayerToTeam(team, newTeamPlayer);
-//            if(added) {
-//                gameService.removeWatcher(team.getGame().getId(), newTeamPlayer);
-//            }
             return ResponseEntity.ok(added + "");
         } catch (UsernameNotFoundException | TeamException | RequestValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -92,9 +89,6 @@ public class TeamController {
             Team team = teamService.getTeamOrThrow(teamId);
             requestValidationService.validateTeamReduction(requester, playerToRemove, team);
             Boolean result = teamService.removePlayerFromTeam(team, playerToRemove);
-//            if(moveToWatchers) {
-//                gameService.addWatcher(team.getGame(), playerToRemove, teamService.getGamePlayers(team.getGame()));
-//            }
             return ResponseEntity.ok(result.toString());
         } catch (UsernameNotFoundException | TeamException | RequestValidationException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

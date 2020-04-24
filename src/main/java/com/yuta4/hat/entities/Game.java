@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "teamTurn"})
+@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn"})
 public class Game {
 
     @Id

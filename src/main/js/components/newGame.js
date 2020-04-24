@@ -1,6 +1,11 @@
 import React from 'react';
-import { useStoreActions } from "easy-peasy";
+import {useStoreActions} from "easy-peasy";
 import Login from "./login";
+import {Header, Icon, Segment, Button} from "semantic-ui-react";
+import logo from '../images/hat.png';
+
+// const src = require('../images/hat.png');
+
 const client = require('../client');
 
 const NewGame = (props) => {
@@ -18,12 +23,19 @@ const NewGame = (props) => {
     }
 
     return (
-        <div>
+        <Segment clearing secondary>
             <Login/>
-            <h1>NewGameScreen</h1>
-            <button onClick={createGame}>Create new game</button>
-            <button onClick={() => moveToJoinGameOption(props.history)}>Join existing one</button>
-        </div>
+            <Header image={logo}
+                    as='h1' textAlign='center'>
+                <Header.Content>Hat online</Header.Content>
+            </Header>
+            <Button.Group attached='bottom'>
+                <Button onClick={createGame} color='green' icon='file outline' content='Create'/>
+                <Button.Or />
+                <Button onClick={() => moveToJoinGameOption(props.history)} color='pink' icon='fork'
+                        content='Join'/>
+            </Button.Group>
+        </Segment>
     )
 };
 

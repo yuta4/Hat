@@ -48,6 +48,8 @@ public class GameProgressPublisher implements
                             .build());
                 } catch (InterruptedException e) {
                     ReflectionUtils.rethrowRuntimeException(e);
+                } catch (Throwable t) {
+                    logger.error("GameProgress publisher next throw" + t.getMessage());
                 }
         });
     }

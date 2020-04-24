@@ -34,14 +34,6 @@ public class TeamService {
         return team;
     }
 
-    public Boolean addPlayerToTeam(Team team, Player newPlayer) {
-        Game game = team.getGame();
-        validateAddingPlayersToTeam(getGameTeams(game), newPlayer);
-        team.getPlayers().add(newPlayer);
-        playerService.setLastGame(newPlayer, game);
-        return true;
-    }
-
     private void validateAddingPlayersToTeam(List<Team> sameGameTeams, Player newPlayer) {
         if(Boolean.TRUE.equals(newPlayer.getLastGame().getIsActive())) {
             throw new TeamException(
@@ -102,9 +94,23 @@ public class TeamService {
                 .collect(Collectors.toSet());
     }
 
+    public Boolean addPlayerToTeam(Team team, Player newPlayer) {
+        Game game = team.getGame();
+        validateAddingPlayersToTeam(getGameTeams(game), newPlayer);
+        team.getPlayers().add(newPlayer);
+        playerService.setLastGame(newPlayer, game);
+        if(!gameService.removeWatcher(game.getId(), newPlayer)) {
+            teamRepository.save(team);
+        }
+        return true;
+    }
+
     public Boolean removePlayerFromTeam(Team team, Player playerToRemoved) {
         boolean isRemoved = team.getPlayers().remove(playerToRemoved);
-        teamRepository.save(team);
+        Game game = team.getGame();
+        if(!gameService.addWatcher(game, playerToRemoved, getGamePlayers(game))) {
+            teamRepository.save(team);
+        }
         return isRemoved;
     }
 }

@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions, useStoreState} from 'easy-peasy';
-import {Button, Divider, Header, Icon, Item, Label, List, Message, Segment} from 'semantic-ui-react'
-import Select from 'react-select'
-import Login from './login';
+import {Button, Divider, Dropdown, Header, Icon, Item, Label, List, Message} from 'semantic-ui-react'
+import {generatingWords, teamFormation} from '../screenNames';
 import ScreenHeader from './screenHeader';
 import OwnerControls from './ownerControls';
-import SSESubscription from '../sseSubscription'
+import SSESubscription from '../sseSubscription';
 
 const client = require('../client');
 
@@ -39,24 +38,36 @@ const TeamFormation = (props) => {
 
     useEffect(() => {
         gameProgressSubscription.start();
-
         return () => {
             gameProgressSubscription.stop();
+            client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
+                console.log('TeamFormation useEffect clear changeWatcher = false');
+            });
         }
-    });
+    }, []);
 
     useEffect(() => {
-        console.log('TeamFormation useEffect');
-        client({method: 'PUT', path: '/game/changeWatcher?value=' + !isPlayer + '&gameId=' + gid}).done(response => {
-            console.log('TeamFormation useEffect changeWatcher ' + !isPlayer);
-        });
+        const needChange = isPlayer === isWatcher;
+        console.log('TeamFormation useEffect isPlayer ' + isPlayer +
+            ', isWatcher ' + isWatcher + ': ' + needChange);
+        if (needChange) {
+            client({
+                method: 'PUT',
+                path: '/game/changeWatcher?value=' + !isPlayer + '&gameId=' + gid
+            }).done(response => {
+                console.log('TeamFormation useEffect changeWatcher ' + !isPlayer);
+            });
+        }
     }, [isPlayer]);
 
     function closeGame() {
-        client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
-            console.log('closeGame');
-            props.history.push({pathname: '/'});
-        });
+        if (window.confirm('Are you sure you wish to close this game?')) {
+            // this.onCancel(item)
+            client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
+                console.log('closeGame');
+                props.history.push({pathname: '/'});
+            });
+        }
     }
 
     function createTeam() {
@@ -65,18 +76,10 @@ const TeamFormation = (props) => {
         });
     }
 
-    function nextScreen() {
-
-    }
-
-    function prevScreen() {
-
-    }
-
     return (
         <div>
             <ScreenHeader iconName='users' iconColor='olive'
-                          headerName='Team formation' owner={owner} gid={gid}/>
+                          headerName={teamFormation} owner={owner} gid={gid}/>
             {
                 isOwner &&
                 <Button inverted color='violet' onClick={createTeam}>
@@ -93,18 +96,14 @@ const TeamFormation = (props) => {
             <Divider/>
             {
                 (isWatcher && !isOwner) &&
-                <Button inverted color='red' onClick={() => {
-                    console.log('TeamFormation isWatcher = false, moveToJoinGameOption');
-                    client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
-                        console.log('TeamFormation useEffect clear changeWatcher = false');
-                        moveToJoinGameOption(props.history)
-                    });
-
-                }}>Back to join</Button>
+                <Button onClick={() => {
+                    moveToJoinGameOption(props.history)
+                }}
+                        inverted color='red'>Back to join</Button>
             }
             {
                 isOwner &&
-                <OwnerControls validation={validation} prevScreen={prevScreen} nextScreen={nextScreen}
+                <OwnerControls validation={validation} nextScreen={generatingWords}
                                closeGame={closeGame}/>
             }
         </div>
@@ -141,6 +140,7 @@ const Team = ((props) => {
     const isOwner = props.isOwner;
     const login = props.login;
     const possiblePlayers = props.possiblePlayers;
+    const [newPlayerDropdown, setNewPlayerDropdown] = useState();
 
     function deleteTeam() {
         client({method: 'DELETE', path: '/team/delete?teamId=' + team.id}).done(() => {
@@ -156,6 +156,18 @@ const Team = ((props) => {
             path: '/team/reduce?playerLogin=' + playerName + '&teamId=' + team.id + '&moveToWatchers=true'
         }).done(() => {
             console.log('team reduced');
+        });
+    }
+
+    function addPlayer(value) {
+        setNewPlayerDropdown('');
+        client({
+            method: 'PUT',
+            path: '/team/extend?newPlayerLogin=' + value + '&teamId=' + team.id
+        }).done((response) => {
+            console.log('team extended');
+        }, (response) => {
+            console.log('team extension error ' + response);
         });
     }
 
@@ -191,28 +203,18 @@ const Team = ((props) => {
             </List>
             {
                 isOwner &&
-                <NewPlayer possiblePlayers={possiblePlayers} teamId={team.id}/>
+                <Dropdown
+                    value={newPlayerDropdown}
+                    trigger={<span><Icon name='add user'/>Add player</span>}
+                          onChange={(event, data) => {
+                              addPlayer(data.value)
+                          }}
+                          options={possiblePlayers.map(possiblePlayer => (
+                              {key: possiblePlayer, value: possiblePlayer, text: possiblePlayer}))}/>
+
             }
         </Message>
     );
-});
-
-const NewPlayer = ((props) => {
-    const possiblePlayers = props.possiblePlayers;
-    const teamId = props.teamId;
-
-    function addPlayer(value) {
-        client({method: 'PUT', path: '/team/extend?newPlayerLogin=' + value + '&teamId=' + teamId}).done((response) => {
-            console.log('team extended');
-        }, (response) => {
-            console.log('team extension error ' + response);
-        });
-    }
-
-    return <Select onChange={event => {
-        addPlayer(event.value)
-    }
-    } options={possiblePlayers.map(possiblePlayer => ({value: possiblePlayer, label: possiblePlayer}))}/>
 });
 
 export default TeamFormation;
