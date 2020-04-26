@@ -1,6 +1,8 @@
 package com.yuta4.hat.services;
 
 import com.yuta4.hat.GameProgress;
+import com.yuta4.hat.Language;
+import com.yuta4.hat.Level;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
@@ -37,9 +39,7 @@ public class GameService {
     }
 
     public void finishGameIfPermitted(Game game, Player player) {
-        if(!game.getOwner().equals(player)) {
-            throw new RequestValidationException("Only game owner can finish the game");
-        }
+        validateGameOwner(player, game, "Only game owner can finish the game");
         game.setIsActive(false);
         gameRepository.save(game);
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
@@ -108,5 +108,42 @@ public class GameService {
         Game game = teamToDelete.getGame();
         game.getTeams().remove(teamToDelete);
         gameRepository.save(game);
+    }
+
+    public void setLanguageProp(Player player, Long gameId, String languageDisplayName, boolean value) {
+        Game game = getGameById(gameId);
+        validateGameOwner(player, game, "Only game owner can change game properties");
+        Language language = Language.getByDisplayName(languageDisplayName);
+        if(value) {
+            game.getWordsLanguages().add(language);
+        } else {
+            game.getWordsLanguages().remove(language);
+        }
+        gameRepository.save(game);
+    }
+
+    public void setLevelProp(Player player, Long gameId, String levelDisplayName, boolean value) {
+        Game game = getGameById(gameId);
+        validateGameOwner(player, game, "Only game owner can change game properties");
+        Level language = Level.getByDisplayName(levelDisplayName);
+        if(value) {
+            game.getWordsLevels().add(language);
+        } else {
+            game.getWordsLevels().remove(language);
+        }
+        gameRepository.save(game);
+    }
+
+    public void setWordsPerPlayer(Player player, Long gameId, Integer value) {
+        Game game = getGameById(gameId);
+        validateGameOwner(player, game, "Only game owner can change game properties");
+        game.setWordsPerPlayer(value);
+        gameRepository.save(game);
+    }
+
+    private void validateGameOwner(Player player, Game game, String s) {
+        if (!game.getOwner().equals(player)) {
+            throw new RequestValidationException(s);
+        }
     }
 }

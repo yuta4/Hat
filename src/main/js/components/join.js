@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useStoreActions} from "easy-peasy";
-import {Button, Label} from "semantic-ui-react";
+import {Button, Header, Icon, Label, Menu, Segment} from "semantic-ui-react";
 import Login from "./login";
 import SSESubscription from "../sseSubscription";
+import {join, teamFormation} from "../screenNames";
 
 const JoinScreen = (props) => {
 
@@ -33,16 +34,24 @@ const JoinScreen = (props) => {
 
     return (
         <div>
-            <Login/>
-            <h1>Join</h1>
-            <Button onClick={() => toMain()}>To main menu</Button>
+            <Segment clearing secondary>
+                <Login/>
+                <Header as='h1' icon textAlign='center'>
+                    <Icon name={'fork'} color={'pink'} circular/>
+                    <Header.Content>{join}</Header.Content>
+                </Header>
+            </Segment>
+            <Button color='blue' onClick={() => toMain()}>To main menu</Button>
+            <Menu fluid vertical>
             {gamesToJoin.map(game => (
-                <div key={game.gameId}>
-                    <Button onClick={() => joinGame(game.gameId)}>Join</Button>
-                    <Label color='blue' horizontal>{game.gameId}</Label>
-                    <Label color='yellow' horizontal>{game.login}</Label>
-                </div>
+                <Menu.Item
+                    name={game.gameId}
+                    onClick={() => joinGame(game.gameId)}>
+                    <Label color='yellow'>{game.login}</Label>
+                    {game.gameId}
+                </Menu.Item>
             ))}
+            </Menu>
         </div>
     )
 };

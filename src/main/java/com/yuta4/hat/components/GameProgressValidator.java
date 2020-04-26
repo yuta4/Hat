@@ -1,6 +1,8 @@
 package com.yuta4.hat.components;
 
 import com.yuta4.hat.GameProgress;
+import com.yuta4.hat.Language;
+import com.yuta4.hat.Level;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class GameProgressValidator {
@@ -59,9 +62,17 @@ public class GameProgressValidator {
     }
 
     private Optional<String> checkGeneratingWords(Game game) {
-        List<GameWord> gameWords = game.getWords();
-        if(gameWords == null || gameWords.isEmpty()) {
-            return Optional.of("There are no words generated for this game");
+        Integer wordsPerPlayer = game.getWordsPerPlayer();
+        if(wordsPerPlayer == null || wordsPerPlayer < 1) {
+            return Optional.of("You need to have at least one word per player");
+        }
+        Set<Language> wordsLanguages = game.getWordsLanguages();
+        if(wordsLanguages == null || wordsLanguages.isEmpty()) {
+            return Optional.of("At least one language should be selected");
+        }
+        Set<Level> wordsLevels = game.getWordsLevels();
+        if(wordsLevels == null || wordsLevels.isEmpty()) {
+            return Optional.of("At least one words level should be selected");
         }
         return Optional.empty();
     }

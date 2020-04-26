@@ -21,10 +21,10 @@ import java.security.Principal;
 @RequestMapping("/team")
 public class TeamController {
 
-    private PlayerService playerService;
-    private GameService gameService;
-    private TeamService teamService;
-    private RequestValidationService requestValidationService;
+    private final PlayerService playerService;
+    private final GameService gameService;
+    private final TeamService teamService;
+    private final RequestValidationService requestValidationService;
 
     public TeamController(PlayerService playerService, GameService gameService, TeamService teamService,
                           RequestValidationService requestValidationService) {

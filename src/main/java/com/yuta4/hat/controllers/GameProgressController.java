@@ -17,9 +17,9 @@ import java.util.Map;
 @RequestMapping("/progress")
 public class GameProgressController {
 
-    private GameService gameService;
-    private PlayerService playerService;
-    private TeamService teamService;
+    private final GameService gameService;
+    private final PlayerService playerService;
+    private final TeamService teamService;
 
     private Flux<ServerSentEvent<Map<String, Object>>> gameProgressFlux;
 

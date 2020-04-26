@@ -16,7 +16,6 @@ public class Word {
     private String string;
 
     @Enumerated(EnumType.STRING)
-
     private Level level;
 
     private Integer used;

@@ -14,7 +14,7 @@ import java.util.Set;
 @RequestMapping("/players")
 public class PlayerController {
 
-    private PlayerRepository playerRepository;
+    private final PlayerRepository playerRepository;
 
     public PlayerController(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;

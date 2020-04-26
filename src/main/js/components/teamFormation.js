@@ -17,7 +17,6 @@ const TeamFormation = (props) => {
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
     const moveToJoinGameOption = useStoreActions(actions => actions.moveToJoinGameOption);
-    const isValidationPassed = validation.trim() === '';
 
     const isPlayer = teams.flatMap(team => team.players).includes(login);
     const isWatcher = watchers.includes(login);
@@ -60,16 +59,6 @@ const TeamFormation = (props) => {
         }
     }, [isPlayer]);
 
-    function closeGame() {
-        if (window.confirm('Are you sure you wish to close this game?')) {
-            // this.onCancel(item)
-            client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
-                console.log('closeGame');
-                props.history.push({pathname: '/'});
-            });
-        }
-    }
-
     function createTeam() {
         client({method: 'POST', path: '/team/create?gameId=' + gid}).done(() => {
             console.log('Team created');
@@ -104,7 +93,7 @@ const TeamFormation = (props) => {
             {
                 isOwner &&
                 <OwnerControls validation={validation} nextScreen={generatingWords}
-                               closeGame={closeGame}/>
+                               gid={gid}/>
             }
         </div>
     )

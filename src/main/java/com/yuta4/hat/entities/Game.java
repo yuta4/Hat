@@ -2,10 +2,13 @@ package com.yuta4.hat.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yuta4.hat.GameProgress;
+import com.yuta4.hat.Language;
+import com.yuta4.hat.Level;
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +22,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<GameWord> words;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -47,4 +50,18 @@ public class Game {
 
     @OneToOne
     private Team teamTurn;
+
+    private Integer wordsPerPlayer = 15;
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Language.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "game_words_language")
+    @Column(name = "words_language")
+    private Set<Language> wordsLanguages = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = Level.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "game_words_level")
+    @Column(name = "words_level")
+    private Set<Level> wordsLevels = new HashSet<>();
 }

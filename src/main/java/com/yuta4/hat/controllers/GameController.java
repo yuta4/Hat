@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GameController {
 
-    private GameService gameService;
-    private PlayerService playerService;
-    private WordService wordService;
-    private TeamService teamService;
-    private GameWordService gameWordService;
-    private Flux<Set<JoinGameDto>> joinGameFlux;
-    private Logger logger = LoggerFactory.getLogger(GameController.class);
+    private final GameService gameService;
+    private final PlayerService playerService;
+    private final WordService wordService;
+    private final TeamService teamService;
+    private final GameWordService gameWordService;
+    private final Flux<Set<JoinGameDto>> joinGameFlux;
+    private final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(GameService gameService, PlayerService playerService, WordService wordService,
                           TeamService teamService, GameWordService gameWordService, JoinGamePublisher joinGamePublisher) {

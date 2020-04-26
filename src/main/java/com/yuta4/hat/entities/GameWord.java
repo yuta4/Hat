@@ -18,9 +18,6 @@ public class GameWord {
     @ManyToOne
     private Word word;
 
-//    @Enumerated(EnumType.STRING)
-//    private Round round;
-
     @ManyToOne
     private Team team;
 }

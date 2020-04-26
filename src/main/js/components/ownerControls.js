@@ -9,7 +9,7 @@ const OwnerControls = (props) => {
     const isValidationPassed = validation.trim() === '';
     const prevScreen = props.prevScreen;
     const nextScreen = props.nextScreen;
-    const closeGame = props.closeGame;
+    const gid = props.gid;
 
     function moveProgress(progress) {
         client({
@@ -21,6 +21,15 @@ const OwnerControls = (props) => {
         }, response => {
             console.log('moveToGameProgressScreen error ' + response.status);
         });
+    }
+
+    function closeGame() {
+        if (window.confirm('Are you sure you wish to close this game?')) {
+            client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
+                console.log('closeGame');
+                props.history.push({pathname: '/'});
+            });
+        }
     }
 
     return (

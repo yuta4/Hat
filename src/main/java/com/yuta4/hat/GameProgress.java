@@ -1,45 +1,45 @@
 package com.yuta4.hat;
 
 import com.yuta4.hat.components.GameProgressValidator;
+import com.yuta4.hat.converter.GenerateWordsDtoConverter;
 import com.yuta4.hat.converter.TeamsScreenDtoConverter;
+import com.yuta4.hat.dto.ScreenDto;
 import com.yuta4.hat.entities.Game;
+import org.springframework.core.convert.converter.Converter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 public enum GameProgress {
-    TEAMS_FORMATION("Teams formation","/teams/"),
-    GENERATING_WORDS("Generating words","/words/"),
-    FIRST_ROUND("First round","/first/"),
-    SECOND_ROUND("Second round","/second/"),
-    THIRD_ROUND("Third round","/third/"),
-    SUMMERY_VIEW("Summary","/summary/");
+    TEAMS_FORMATION("Teams formation", "/teams/",
+            new TeamsScreenDtoConverter()),
+    GENERATING_WORDS("Generating words", "/words/",
+            new GenerateWordsDtoConverter()),
+    FIRST_ROUND("First round", "/first/", game -> null),
+    SECOND_ROUND("Second round", "/second/", game -> null),
+    THIRD_ROUND("Third round", "/third/", game -> null),
+    SUMMERY_VIEW("Summary", "/summary/", game -> null);
 
     private final String path;
-    private static TeamsScreenDtoConverter teamsScreenDtoConverter;
     private static GameProgressValidator gameProgressValidator;
     private final String displayName;
+    private final Converter<Game, ? extends ScreenDto> dataConverter;
 
-    public static void setTeamService(TeamsScreenDtoConverter teamsScreenDtoConverter, GameProgressValidator gameProgressValidator) {
-        GameProgress.teamsScreenDtoConverter = teamsScreenDtoConverter;
+    public static void setTeamService(GameProgressValidator gameProgressValidator) {
         GameProgress.gameProgressValidator = gameProgressValidator;
     }
 
     public Map<String, Object> getData(Game game) {
-        if(this == TEAMS_FORMATION) {
-            return Map.of(
-                    "path", path + game.getId(),
-                    "data", teamsScreenDtoConverter.convert(game),
-                    "validation", gameProgressValidator.validateRequirements(game)
-            );
-        }
-        return Collections.emptyMap();
+        return Map.of(
+                "path", path + game.getId(),
+                "data", dataConverter.convert(game),
+                "validation", gameProgressValidator.validateRequirements(game));
     }
 
-    GameProgress(String displayName, String path) {
+    GameProgress(String displayName, String path, Converter<Game, ? extends ScreenDto> dataConverter) {
         this.displayName = displayName;
         this.path = path;
+        this.dataConverter = dataConverter;
     }
 
     public static GameProgress getByDisplayName(String displayName) {
@@ -48,16 +48,4 @@ public enum GameProgress {
                 .findFirst()
                 .orElseThrow();
     }
-
-//    private static GameProgress[] vals = values();
-//
-//    public GameProgress next()
-//    {
-//        return vals[(this.ordinal() + 1) % vals.length];
-//    }
-//
-//    public GameProgress previous()
-//    {
-//        return vals[(this.ordinal() - 1) % vals.length];
-//    }
 }

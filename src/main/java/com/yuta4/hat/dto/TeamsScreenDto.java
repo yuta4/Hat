@@ -9,7 +9,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @ToString
-public class TeamsScreenDto {
+public class TeamsScreenDto implements ScreenDto {
     private Set<TeamDto> teams;
     private String owner;
     private Set<String> watchers;

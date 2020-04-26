@@ -1,6 +1,5 @@
 package com.yuta4.hat.services;
 
-import com.yuta4.hat.components.GameProgressListener;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
@@ -35,12 +34,13 @@ public class TeamService {
     }
 
     private void validateAddingPlayersToTeam(List<Team> sameGameTeams, Player newPlayer) {
-        if(Boolean.TRUE.equals(newPlayer.getLastGame().getIsActive())) {
+        if (newPlayer.getLastGame() != null &&
+                Boolean.TRUE.equals(newPlayer.getLastGame().getIsActive())) {
             throw new TeamException(
                     String.format("Can't add player %s to the team because he has not finished game", newPlayer));
         }
         sameGameTeams.forEach(team -> {
-            if(team.getPlayers().contains(newPlayer)) {
+            if (team.getPlayers().contains(newPlayer)) {
                 throw new TeamException(
                         String.format("%s can't be added to new team as he is already present in team %s",
                                 newPlayer, team.getPlayers()));
@@ -67,7 +67,7 @@ public class TeamService {
         while (nextPlayer != player) {
             nextPlayer = teamPlayersIterator.next();
         }
-        if(teamPlayersIterator.hasNext()) {
+        if (teamPlayersIterator.hasNext()) {
             nextPlayer = teamPlayersIterator.next();
         } else {
             nextPlayer = firstPlayer;
@@ -99,7 +99,7 @@ public class TeamService {
         validateAddingPlayersToTeam(getGameTeams(game), newPlayer);
         team.getPlayers().add(newPlayer);
         playerService.setLastGame(newPlayer, game);
-        if(!gameService.removeWatcher(game.getId(), newPlayer)) {
+        if (!gameService.removeWatcher(game.getId(), newPlayer)) {
             teamRepository.save(team);
         }
         return true;
@@ -108,7 +108,7 @@ public class TeamService {
     public Boolean removePlayerFromTeam(Team team, Player playerToRemoved) {
         boolean isRemoved = team.getPlayers().remove(playerToRemoved);
         Game game = team.getGame();
-        if(!gameService.addWatcher(game, playerToRemoved, getGamePlayers(game))) {
+        if (!gameService.addWatcher(game, playerToRemoved, getGamePlayers(game))) {
             teamRepository.save(team);
         }
         return isRemoved;

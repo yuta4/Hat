@@ -4,6 +4,7 @@ import TeamFormation from "./components/teamFormation"
 import NewGame from "./components/newGame"
 import Start from "./components/start"
 import JoinScreen from "./components/join";
+import GenerateWords from "./components/generateWords";
 import model from "./model"
 import React from 'react';
 
@@ -18,6 +19,7 @@ ReactDOM.render(
         <BrowserRouter>
             <Route exact path="/" component={Start}/>
             <Route exact path="/teams/:gid" component={TeamFormation}/>
+            <Route exact path="/words/:gid" component={GenerateWords}/>
             <Route exact path="/create" component={NewGame}/>
             <Route exact path="/join" component={JoinScreen}/>
         </BrowserRouter>
