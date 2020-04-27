@@ -15,5 +15,6 @@ public class GenerateWordsScreenDto implements ScreenDto {
     private Set<StringCheckboxDto> wordsLevels;
     private Set<StringCheckboxDto> wordsLanguages;
     private Integer wordsPerPlayer;
+    private Integer gameWords;
 
 }

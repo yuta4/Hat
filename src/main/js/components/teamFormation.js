@@ -26,7 +26,8 @@ const TeamFormation = (props) => {
     console.log('TeamFormation init owner ' + owner + ' teams ' + JSON.stringify(teams) + ' watchers ' + watchers);
     console.log('TeamFormation init validation ' + validation + ' login ' + login + ' gid ' + gid);
 
-    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid, setTeamFormationData);
+    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid,
+        setTeamFormationData, props.location.pathname, props.history);
 
     function setTeamFormationData(eventJson) {
         setOwner(eventJson.data.owner);

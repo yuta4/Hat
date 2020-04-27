@@ -27,7 +27,10 @@ public class GenerateWordsDtoConverter implements Converter<Game, GenerateWordsS
                                 language.getDisplayName(),
                                 game.getWordsLanguages().contains(language)))
                         .collect(Collectors.toCollection(LinkedHashSet::new)),
-                game.getWordsPerPlayer()
+                game.getWordsPerPlayer(),
+                game.getTeams().stream()
+                        .map(team -> team.getPlayers().size())
+                        .reduce(0, Integer::sum) * game.getWordsPerPlayer()
         );
     }
 

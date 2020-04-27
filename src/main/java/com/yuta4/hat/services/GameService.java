@@ -45,8 +45,9 @@ public class GameService {
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
     }
 
-    public boolean saveGameProgress(Player player, Game game, GameProgress gameProgress) {
+    public boolean changeGameProgress(Player player, Game game, GameProgress gameProgress) {
         if(game.getOwner().equals(player)) {
+            gameProgress.proceedGameProgress(game);
             game.setGameProgress(gameProgress);
             gameRepository.save(game);
             return true;

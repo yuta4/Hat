@@ -3,7 +3,7 @@ import {firstRound, generatingWords, teamFormation} from "../screenNames";
 import React, {useEffect, useState} from "react";
 import OwnerControls from "./ownerControls";
 import {useStoreState} from "easy-peasy";
-import {Form, Select} from "semantic-ui-react";
+import {Form, Message} from "semantic-ui-react";
 import SSESubscription from "../sseSubscription";
 
 const client = require('../client');
@@ -20,16 +20,19 @@ const GenerateWords = (props) => {
     const [levels, setLevels] = useState(props.location.state.data.wordsLevels);
     const initialWordsPerPlayer = props.location.state.data.wordsPerPlayer;
     const [wordsPerPlayer, setWordsPerPlayer] = useState(initialWordsPerPlayer === null || initialWordsPerPlayer === undefined ? '' : initialWordsPerPlayer);
+    const [gameWords, setGameWords] = useState(props.location.state.data.gameWords);
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
     const isOwner = owner === login;
 
-    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid, setGenerateWordsData);
+    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid,
+        setGenerateWordsData, props.location.pathname, props.history);
 
     function setGenerateWordsData(eventJson) {
         setOwner(eventJson.data.owner);
         setLanguages(eventJson.data.wordsLanguages);
         setLevels(eventJson.data.wordsLevels);
+        setGameWords(eventJson.data.gameWords);
         setWordsPerPlayer(eventJson.data.wordsPerPlayer);
         setValidation(eventJson.validation);
     }
@@ -78,18 +81,31 @@ const GenerateWords = (props) => {
 
             <Form>
                 <Form.Group>
-                    <Form.Select options={possibleWordsCountOptions} value={wordsPerPlayer}
-                                onChange={onWordsPerPlayer}
-                                label='Words per player' search/>
+                    {
+                        isOwner &&
+                        <Form.Select options={possibleWordsCountOptions} value={wordsPerPlayer}
+                                     onChange={onWordsPerPlayer}
+                                     label='Words per player' search/>
+                    }
+                    {
+                        !isOwner &&
+                        <Form.Input value={wordsPerPlayer} label='Words per player' readOnly/>
+                    }
                 </Form.Group>
+                <Message
+                    visible
+                    success={wordsPerPlayer > 0}
+                    header='Total words'
+                    content={gameWords}
+                />
                 <Form.Group grouped>
                     <label>Words level</label>
                     {
                         levels.map(level =>
-                            <Form.Checkbox checked={level.value} label={level.name} key={level.name}
+                            <Form.Checkbox disabled={!isOwner} checked={level.value} label={level.name} key={level.name}
                                            onChange={(event, data) => {
                                                levelChange(level.name, data.checked)
-                                           }} />
+                                           }}/>
                         )
                     }
                 </Form.Group>
@@ -97,10 +113,11 @@ const GenerateWords = (props) => {
                     <label>Words language</label>
                     {
                         languages.map(language =>
-                            <Form.Checkbox checked={language.value} label={language.name} key={language.name}
+                            <Form.Checkbox disabled={!isOwner} checked={language.value} label={language.name}
+                                           key={language.name}
                                            onChange={(event, data) => {
                                                languageChange(language.name, data.checked)
-                                           }} />
+                                           }}/>
                         )
                     }
                 </Form.Group>

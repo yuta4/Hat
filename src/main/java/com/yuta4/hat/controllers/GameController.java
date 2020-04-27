@@ -33,7 +33,7 @@ public class GameController {
     private final TeamService teamService;
     private final GameWordService gameWordService;
     private final Flux<Set<JoinGameDto>> joinGameFlux;
-    private final Logger logger = LoggerFactory.getLogger(GameController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(GameService gameService, PlayerService playerService, WordService wordService,
                           TeamService teamService, GameWordService gameWordService, JoinGamePublisher joinGamePublisher) {
@@ -92,31 +92,8 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/generate/words")
-    public ResponseEntity<String> generateWords(Principal principal, @RequestParam Integer wordsPerPlayer,
-                                                @RequestParam(required = false) List<Level> levels) {
-        try {
-            Player player = playerService.getPlayerByLogin(principal.getName());
-            Game game = player.getLastGame();
-            List<Team> gameTeams = teamService.getGameTeams(game);
-
-            int wordsRequired = gameTeams.stream()
-                    .map(team -> team.getPlayers().size() * wordsPerPlayer)
-                    .reduce(Integer::sum)
-                    .orElse(0);
-            if(wordsRequired == 0 || (game.getWords() != null && !game.getWords().isEmpty())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to generate words");
-            }
-            List<Word> generatedWords = wordService.generateRandomWordsByLevels(wordsRequired, levels);
-            gameWordService.convertFromWordsAndPersist(game, generatedWords);
-            return ResponseEntity.ok().build();
-        } catch (NoSuchGameException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-    }
-
     @PutMapping("/round/start")
-    public ResponseEntity<List<String>> startRound(Principal principal) {
+    public ResponseEntity<Set<String>> startRound(Principal principal) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = player.getLastGame();
         //TODO start timer

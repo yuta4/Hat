@@ -30,7 +30,8 @@ const JoinScreen = (props) => {
         props.history.push({pathname: '/'});
     }
 
-    const gamesToJoinSubscription = new SSESubscription("/game/notStartedEvents", "message", setGamesToJoin);
+    const gamesToJoinSubscription = new SSESubscription("/game/notStartedEvents", "message",
+        setGamesToJoin, '/join', props.history);
 
     return (
         <div>

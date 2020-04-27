@@ -1,5 +1,7 @@
-function SSESubscription(url, eventType, eventHandler) {
+function SSESubscription(url, eventType, eventHandler, path, history) {
 
+    this.path = path;
+    this.history = history;
     this.source = null;
 
     this.start = function () {
@@ -10,7 +12,7 @@ function SSESubscription(url, eventType, eventHandler) {
             let eventJson = JSON.parse(event.data);
             console.log('Got update ' + url + ' : ' + eventType + ', ' +
                 event.lastEventId + '. ' + JSON.stringify(eventJson));
-            eventHandler(eventJson);
+            checkPathChange(eventJson);
         });
 
         this.source.onerror = function (event) {
@@ -24,6 +26,14 @@ function SSESubscription(url, eventType, eventHandler) {
         console.log('SSESubscription stop ' + url + ' : ' + eventType);
         this.source.close();
     };
+
+    function checkPathChange(eventJson) {
+        if(path !== eventJson.path) {
+            history.push({pathname: eventJson.path, state: eventJson})
+        } else {
+            eventHandler(eventJson);
+        }
+    }
 }
 
 export default SSESubscription;

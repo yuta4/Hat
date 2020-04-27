@@ -55,7 +55,7 @@ public class GameProgressController {
                                                 @RequestParam String progressToMoveTo) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
-        gameService.saveGameProgress(player, game, GameProgress.getByDisplayName(progressToMoveTo));
+        gameService.changeGameProgress(player, game, GameProgress.getByDisplayName(progressToMoveTo));
         return game.getGameProgress().getData(game);
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,25 +30,24 @@ public class GameWordService {
         random = new Random();
     }
 
-    public void convertFromWordsAndPersist(Game game, List<Word> words) {
-        List<GameWord> gameWords = words.stream()
+    public void convertFromWordsAndPersist(Game game, Set<Word> words) {
+        Set<GameWord> gameWords = words.stream()
                 .map(word -> {
                     GameWord gameWord = new GameWord();
                     gameWord.setWord(word);
                     gameWord.setGame(game);
-                    gameWordRepository.save(gameWord);
                     return gameWord;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         game.setWords(gameWords);
         gameRepository.save(game);
     }
 
-    public List<String> getNotGuessedWords(Game game) {
+    public Set<String> getNotGuessedWords(Game game) {
         return game.getWords().stream()
                 .filter(gameWord -> gameWord.getTeam() == null)
                 .map(gameWord -> gameWord.getWord().getString())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public void markAsGuessed(List<String> strings, Team team) {

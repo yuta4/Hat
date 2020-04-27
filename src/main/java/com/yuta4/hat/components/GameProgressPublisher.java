@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class GameProgressPublisher implements
         Consumer<FluxSink<ServerSentEvent<Map<String, Object>>>> {
 
-    Logger logger = LoggerFactory.getLogger(GameProgressPublisher.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameProgressPublisher.class);
 
     private final Executor executor;
     private final BlockingQueue<GameProgressEvent> queue;

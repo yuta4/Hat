@@ -1,6 +1,7 @@
 package com.yuta4.hat.components;
 
 import com.yuta4.hat.events.GameProgressEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -10,9 +11,10 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.BlockingQueue;
 
 @Component
+@Slf4j
 public class GameProgressListener implements ApplicationListener<GameProgressEvent> {
 
-    Logger logger = LoggerFactory.getLogger(GameProgressListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameProgressListener.class);
 
     private final BlockingQueue<GameProgressEvent> queue;
 

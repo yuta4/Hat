@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.toSet;
 public class JoinGamePublisher implements
         Consumer<FluxSink<Set<JoinGameDto>>> {
 
-    Logger logger = LoggerFactory.getLogger(JoinGamePublisher.class);
+    private static final Logger logger = LoggerFactory.getLogger(JoinGamePublisher.class);
 
     private final Executor executor;
     private final BlockingQueue<NewGameEvent> queue;

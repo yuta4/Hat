@@ -9,21 +9,27 @@ import org.springframework.core.convert.converter.Converter;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public enum GameProgress {
     TEAMS_FORMATION("Teams formation", "/teams/",
             new TeamsScreenDtoConverter()),
     GENERATING_WORDS("Generating words", "/words/",
             new GenerateWordsDtoConverter()),
-    FIRST_ROUND("First round", "/first/", game -> null),
-    SECOND_ROUND("Second round", "/second/", game -> null),
-    THIRD_ROUND("Third round", "/third/", game -> null),
-    SUMMERY_VIEW("Summary", "/summary/", game -> null);
+    FIRST_ROUND("First round", "/first/",
+            game -> null),
+    SECOND_ROUND("Second round", "/second/",
+            game -> null),
+    THIRD_ROUND("Third round", "/third/",
+            game -> null),
+    SUMMERY_VIEW("Summary", "/summary/",
+            game -> null);
 
     private final String path;
     private static GameProgressValidator gameProgressValidator;
     private final String displayName;
     private final Converter<Game, ? extends ScreenDto> dataConverter;
+    private Consumer<Game> progressProcessor;
 
     public static void setTeamService(GameProgressValidator gameProgressValidator) {
         GameProgress.gameProgressValidator = gameProgressValidator;
@@ -36,7 +42,12 @@ public enum GameProgress {
                 "validation", gameProgressValidator.validateRequirements(game));
     }
 
-    GameProgress(String displayName, String path, Converter<Game, ? extends ScreenDto> dataConverter) {
+    public void proceedGameProgress(Game game) {
+        progressProcessor.accept(game);
+    }
+
+    GameProgress(String displayName, String path,
+                 Converter<Game, ? extends ScreenDto> dataConverter) {
         this.displayName = displayName;
         this.path = path;
         this.dataConverter = dataConverter;
@@ -47,5 +58,9 @@ public enum GameProgress {
                 .filter(gp -> gp.displayName.equals(displayName))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    public void setProgressProcessor(Consumer<Game> progressProcessor) {
+        this.progressProcessor = progressProcessor;
     }
 }
