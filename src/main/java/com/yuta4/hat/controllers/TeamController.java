@@ -35,17 +35,13 @@ public class TeamController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createTeam(Principal principal, @RequestParam Long gameId,
-                                             @RequestParam(required = false) String name) {
-        try {
-            Player player = playerService.getPlayerByLogin(principal.getName());
-            Game game = gameService.getGameById(gameId);
-            requestValidationService.validate(player, game);
-            Team newTeam = teamService.createTeam(game, name);
-            return ResponseEntity.ok(newTeam.toString());
-        } catch (RequestValidationException | UsernameNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ResponseEntity<Void> createTeam(Principal principal, @RequestParam Long gameId,
+                                           @RequestParam(required = false) String name) {
+        Player player = playerService.getPlayerByLogin(principal.getName());
+        Game game = gameService.getGameById(gameId);
+        requestValidationService.validate(player, game);
+        teamService.createTeam(game, name);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")

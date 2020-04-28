@@ -15,6 +15,10 @@ function SSESubscription(url, eventType, eventHandler, path, history) {
             checkPathChange(eventJson);
         });
 
+        this.source.onopen = function (event) {
+            console.log('sse onopen ' + url + ' : ' + eventType + ', '+ JSON.stringify(event));
+        };
+
         this.source.onerror = function (event) {
             // this.close();
             console.log('Got update error ' + url + ' : ' + eventType + '. ' + event);

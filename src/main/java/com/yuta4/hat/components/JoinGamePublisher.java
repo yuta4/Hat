@@ -7,10 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.FluxSink;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -21,7 +23,7 @@ import static java.util.stream.Collectors.toSet;
 @Slf4j
 @Component
 public class JoinGamePublisher implements
-        Consumer<FluxSink<Set<JoinGameDto>>> {
+        Consumer<FluxSink<ServerSentEvent<Set<JoinGameDto>>>> {
 
     private static final Logger logger = LoggerFactory.getLogger(JoinGamePublisher.class);
 
@@ -36,20 +38,24 @@ public class JoinGamePublisher implements
     }
 
     @Override
-    public void accept(FluxSink<Set<JoinGameDto>> sink) {
+    public void accept(FluxSink<ServerSentEvent<Set<JoinGameDto>>> sink) {
         logger.error("Join game publisher accepted");
         this.executor.execute(() -> {
             while (true)
                 try {
                     logger.error("Join game publisher before taking");
                     queue.take();
-                    logger.error("Join game publisher took");
-                    Set<JoinGameDto> joinGameDto = gameService.getNotStartedGames().stream()
-                            .map(JoinGameDto::new)
-                            .collect(toSet());
-                    sink.next(joinGameDto);
-                }
-                catch (InterruptedException e) {
+                    ServerSentEvent<Set<JoinGameDto>> sse =
+                            ServerSentEvent.<Set<JoinGameDto>>builder()
+                                    .id(LocalDateTime.now().toString())
+                                    .event("join")
+                                    .data(gameService.getNotStartedGames().stream()
+                                            .map(JoinGameDto::new)
+                                            .collect(toSet()))
+                                    .build();
+                    logger.error("Join game publisher took {}", sse);
+                    sink.next(sse);
+                } catch (InterruptedException e) {
                     ReflectionUtils.rethrowRuntimeException(e);
                 }
         });

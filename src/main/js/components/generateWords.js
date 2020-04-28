@@ -126,7 +126,7 @@ const GenerateWords = (props) => {
             {
                 isOwner &&
                 <OwnerControls validation={validation} nextScreen={firstRound}
-                               prevScreen={teamFormation} gid={gid}/>
+                               prevScreen={teamFormation} gid={gid}  history={props.history}/>
             }
         </div>
     )

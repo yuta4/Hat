@@ -63,7 +63,9 @@ const TeamFormation = (props) => {
     function createTeam() {
         client({method: 'POST', path: '/team/create?gameId=' + gid}).done(() => {
             console.log('Team created');
-        });
+        }, (response) => {
+            console.log('Create team error ' + response);
+        } );
     }
 
     return (
@@ -94,7 +96,7 @@ const TeamFormation = (props) => {
             {
                 isOwner &&
                 <OwnerControls validation={validation} nextScreen={generatingWords}
-                               gid={gid}/>
+                               gid={gid} history={props.history}/>
             }
         </div>
     )

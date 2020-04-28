@@ -12,9 +12,9 @@ import com.yuta4.hat.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -32,7 +32,7 @@ public class GameController {
     private final WordService wordService;
     private final TeamService teamService;
     private final GameWordService gameWordService;
-    private final Flux<Set<JoinGameDto>> joinGameFlux;
+    private final Flux<ServerSentEvent<Set<JoinGameDto>>> joinGameFlux;
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(GameService gameService, PlayerService playerService, WordService wordService,
@@ -117,8 +117,10 @@ public class GameController {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @GetMapping(path = "notStartedEvents", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Set<JoinGameDto>> notStartedEvents() {
+    @GetMapping(path = "notStarted/events",
+            produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//            produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<ServerSentEvent<Set<JoinGameDto>>> notStartedEvents() {
         logger.info("notStartedEvents");
         return joinGameFlux.log();
     }

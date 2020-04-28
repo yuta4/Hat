@@ -40,12 +40,13 @@ public class GameProgressPublisher implements
                 try {
                     logger.error("GameProgress publisher before taking");
                     Game game = (Game) queue.take().getSource();
-                    logger.error("GameProgress publisher took " + game.getId());
-                    sink.next(ServerSentEvent.<Map<String, Object>>builder()
+                    ServerSentEvent<Map<String, Object>> sse = ServerSentEvent.<Map<String, Object>>builder()
                             .id(LocalDateTime.now().toString())
                             .event("gameProgress " + game.getId())
                             .data(game.getGameProgress().getData(game))
-                            .build());
+                            .build();
+                    logger.error("GameProgress publisher took " + sse.toString());
+                    sink.next(sse);
                 } catch (InterruptedException e) {
                     ReflectionUtils.rethrowRuntimeException(e);
                 } catch (Throwable t) {

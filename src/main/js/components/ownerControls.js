@@ -10,6 +10,7 @@ const OwnerControls = (props) => {
     const prevScreen = props.prevScreen;
     const nextScreen = props.nextScreen;
     const gid = props.gid;
+    const history = props.history;
 
     function moveProgress(progress) {
         client({
@@ -27,7 +28,7 @@ const OwnerControls = (props) => {
         if (window.confirm('Are you sure you wish to close this game?')) {
             client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
                 console.log('closeGame');
-                props.history.push({pathname: '/'});
+                history.push({pathname: '/'});
             });
         }
     }

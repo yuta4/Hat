@@ -1,15 +1,18 @@
-import React, {useEffect, useState} from "react";
-import {useStoreActions} from "easy-peasy";
-import {Button, Header, Icon, Label, Menu, Segment} from "semantic-ui-react";
-import Login from "./login";
-import SSESubscription from "../sseSubscription";
-import {join, teamFormation} from "../screenNames";
+import React, {useEffect, useState} from 'react';
+import {useStoreActions} from 'easy-peasy';
+import {Button, Header, Icon, Label, Menu, Segment} from 'semantic-ui-react';
+import Login from './login';
+import SSESubscription from '../sseSubscription';
+import {join, teamFormation} from '../screenNames';
 
 const JoinScreen = (props) => {
 
     const [gamesToJoin, setGamesToJoin] = useState(props.location.state);
     const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
     const setGameId = useStoreActions(actions => actions.setGameId);
+
+    const gamesToJoinSubscription = new SSESubscription('/game/notStarted/events', 'join',
+        setGamesToJoin, undefined, props.history);
 
     useEffect(() => {
         console.log('JoinScreen useEffect' + {gamesToJoin});
@@ -19,7 +22,7 @@ const JoinScreen = (props) => {
             console.log('JoinScreen useEffect close');
             gamesToJoinSubscription.stop();
         }
-    });
+    }, []);
 
     function joinGame(id) {
         setGameId(id);
@@ -29,9 +32,6 @@ const JoinScreen = (props) => {
     function toMain() {
         props.history.push({pathname: '/'});
     }
-
-    const gamesToJoinSubscription = new SSESubscription("/game/notStartedEvents", "message",
-        setGamesToJoin, '/join', props.history);
 
     return (
         <div>
@@ -46,7 +46,7 @@ const JoinScreen = (props) => {
             <Menu fluid vertical>
             {gamesToJoin.map(game => (
                 <Menu.Item
-                    name={game.gameId}
+                    name={'' + game.gameId}
                     onClick={() => joinGame(game.gameId)}>
                     <Label color='yellow'>{game.login}</Label>
                     {game.gameId}

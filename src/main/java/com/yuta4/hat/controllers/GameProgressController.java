@@ -5,6 +5,9 @@ import com.yuta4.hat.components.GameProgressPublisher;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.services.*;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/progress")
+@Slf4j
 public class GameProgressController {
+
+    private static final Logger logger = LoggerFactory.getLogger(GameProgressController.class);
 
     private final GameService gameService;
     private final PlayerService playerService;
@@ -47,6 +53,7 @@ public class GameProgressController {
 
     @GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<Map<String, Object>>> getGameProgressEvents() {
+        logger.error("getGameProgressEvents");
         return gameProgressFlux.log();
     }
 
