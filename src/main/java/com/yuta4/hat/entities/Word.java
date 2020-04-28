@@ -3,11 +3,13 @@ package com.yuta4.hat.entities;
 import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@EqualsAndHashCode(of = {"string", "language", "level"})
 public class Word {
 
     @Id

@@ -11,6 +11,7 @@ import React from 'react';
 const ReactDOM = require('react-dom');
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'semantic-ui-css/semantic.min.css';
+import Round from "./components/round";
 
 const store = createStore(model);
 
@@ -20,6 +21,7 @@ ReactDOM.render(
             <Route exact path="/" component={Start}/>
             <Route exact path="/teams/:gid" component={TeamFormation}/>
             <Route exact path="/words/:gid" component={GenerateWords}/>
+            <Route exact path="/first/:gid" component={Round}/>
             <Route exact path="/create" component={NewGame}/>
             <Route exact path="/join" component={JoinScreen}/>
         </BrowserRouter>

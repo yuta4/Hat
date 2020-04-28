@@ -105,8 +105,8 @@ public class GameController {
     public ResponseEntity<List<String>> finishRound(Principal principal, @RequestParam List<String> guessedWords) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         gameWordService.markAsGuessed(guessedWords, teamService.getPlayerTeam(player));
-        teamService.movePlayerTurn(player);
         gameService.moveTeamTurn(player.getLastGame());
+        teamService.movePlayerTurn(player.getLastGame().getTeamTurn());
         return ResponseEntity.ok().build();
     }
 

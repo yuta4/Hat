@@ -2,6 +2,7 @@ package com.yuta4.hat;
 
 import com.yuta4.hat.components.GameProgressValidator;
 import com.yuta4.hat.converter.GenerateWordsDtoConverter;
+import com.yuta4.hat.converter.RoundScreenDtoConverter;
 import com.yuta4.hat.converter.TeamsScreenDtoConverter;
 import com.yuta4.hat.dto.ScreenDto;
 import com.yuta4.hat.entities.Game;
@@ -17,11 +18,11 @@ public enum GameProgress {
     GENERATING_WORDS("Generating words", "/words/",
             new GenerateWordsDtoConverter()),
     FIRST_ROUND("First round", "/first/",
-            game -> null),
+            new RoundScreenDtoConverter(1)),
     SECOND_ROUND("Second round", "/second/",
-            game -> null),
+            new RoundScreenDtoConverter(2)),
     THIRD_ROUND("Third round", "/third/",
-            game -> null),
+            new RoundScreenDtoConverter(3)),
     SUMMERY_VIEW("Summary", "/summary/",
             game -> null);
 

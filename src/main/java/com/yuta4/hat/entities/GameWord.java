@@ -1,11 +1,13 @@
 package com.yuta4.hat.entities;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@EqualsAndHashCode(of = {"game", "word"})
 public class GameWord {
 
     @Id

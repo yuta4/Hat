@@ -3,6 +3,7 @@ package com.yuta4.hat.components;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Word;
+import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.GameWordService;
 import com.yuta4.hat.services.TeamService;
 import com.yuta4.hat.services.WordService;
@@ -23,15 +24,32 @@ public class FirstRoundProcessor implements Consumer<Game> {
     private final TeamService teamService;
     private final GameWordService gameWordService;
     private final WordService wordService;
+    private GameService gameService;
 
-    public FirstRoundProcessor(TeamService teamService, GameWordService gameWordService, WordService wordService) {
+    public FirstRoundProcessor(TeamService teamService, GameWordService gameWordService,
+                               WordService wordService, GameService gameService) {
         this.teamService = teamService;
         this.gameWordService = gameWordService;
         this.wordService = wordService;
+        this.gameService = gameService;
     }
 
     @Override
     public void accept(Game game) {
+        generateWordsIfNeeded(game);
+        generateTurns(game);
+    }
+
+    private void generateTurns(Game game) {
+        if(game.getTeamTurn() == null) {
+            gameService.moveTeamTurn(game);
+        }
+        if(game.getTeamTurn().getPlayerTurn() == null) {
+            teamService.movePlayerTurn(game.getTeamTurn());
+        }
+    }
+
+    private void generateWordsIfNeeded(Game game) {
         int wordsRequired = getWordsRequired(game);
         if (checkIfWordsGeneratedRelevant(game, wordsRequired)) {
             logger.debug("Words for {} already generated", game);

@@ -58,19 +58,21 @@ public class TeamService {
                 .findFirst().orElseThrow(() -> new TeamException("Can't find team for player " + player));
     }
 
-    public void movePlayerTurn(Player player) {
-        Team team = getPlayerTeam(player);
+    public void movePlayerTurn(Team team) {
+        Player lastTurn = team.getPlayerTurn();
         Set<Player> teamPlayers = team.getPlayers();
         Iterator<Player> teamPlayersIterator = teamPlayers.iterator();
         Player firstPlayer = teamPlayersIterator.next();
         Player nextPlayer = firstPlayer;
-        while (nextPlayer != player) {
-            nextPlayer = teamPlayersIterator.next();
-        }
-        if (teamPlayersIterator.hasNext()) {
-            nextPlayer = teamPlayersIterator.next();
-        } else {
-            nextPlayer = firstPlayer;
+        if(lastTurn != null) {
+            while (nextPlayer != lastTurn) {
+                nextPlayer = teamPlayersIterator.next();
+            }
+            if (teamPlayersIterator.hasNext()) {
+                nextPlayer = teamPlayersIterator.next();
+            } else {
+                nextPlayer = firstPlayer;
+            }
         }
         team.setPlayerTurn(nextPlayer);
         teamRepository.save(team);
@@ -79,8 +81,6 @@ public class TeamService {
     public Boolean deleteTeam(Long teamId) {
         Team teamToDelete = getTeamOrThrow(teamId);
         gameService.deleteTeam(teamToDelete);
-        teamRepository.delete(
-                teamToDelete);
         return true;
     }
 
@@ -105,10 +105,13 @@ public class TeamService {
         return true;
     }
 
-    public Boolean removePlayerFromTeam(Team team, Player playerToRemoved) {
-        boolean isRemoved = team.getPlayers().remove(playerToRemoved);
+    public Boolean removePlayerFromTeam(Team team, Player playerToRemove) {
+        boolean isRemoved = team.getPlayers().remove(playerToRemove);
         Game game = team.getGame();
-        if (!gameService.addWatcher(game, playerToRemoved, getGamePlayers(game))) {
+        if(playerToRemove.equals(team.getPlayerTurn())) {
+            team.setPlayerTurn(null);
+        }
+        if (!gameService.addWatcher(game, playerToRemove, getGamePlayers(game))) {
             teamRepository.save(team);
         }
         return isRemoved;

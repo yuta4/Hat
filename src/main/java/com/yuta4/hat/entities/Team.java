@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Data
 @ToString(of = {"id", "players"})
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"game", "players"})
 public class Team {
 
     @Id

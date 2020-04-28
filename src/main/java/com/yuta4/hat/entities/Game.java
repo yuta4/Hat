@@ -5,6 +5,7 @@ import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -15,16 +16,24 @@ import java.util.Set;
 @Entity
 @Data
 @ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn"})
+@EqualsAndHashCode(of = {"id"})
 public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GameWord> words = new HashSet<>();
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public void setWords(Set<GameWord> words) {
+        this.words.clear();
+        if (words != null) {
+            this.words.addAll(words);
+        }
+    }
+
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("game")
     @OrderBy("id desc")
     private Set<Team> teams = new LinkedHashSet<>();
