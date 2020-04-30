@@ -2,9 +2,8 @@ import ScreenHeader from "./screenHeader";
 import {firstRound, generatingWords, teamFormation} from "../screenNames";
 import React, {useEffect, useState} from "react";
 import OwnerControls from "./ownerControls";
-import {useStoreState} from "easy-peasy";
+import {useStoreActions, useStoreState} from "easy-peasy";
 import {Form, Message} from "semantic-ui-react";
-import SSESubscription from "../sseSubscription";
 
 const client = require('../client');
 
@@ -24,9 +23,8 @@ const GenerateWords = (props) => {
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
     const isOwner = owner === login;
-
-    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid,
-        setGenerateWordsData, props.location.pathname, props.history);
+    const addEventListener = useStoreActions(actions => actions.addEventListener);
+    const removeEventListener = useStoreActions(actions => actions.removeEventListener);
 
     function setGenerateWordsData(eventJson) {
         setOwner(eventJson.data.owner);
@@ -38,9 +36,14 @@ const GenerateWords = (props) => {
     }
 
     useEffect(() => {
-        gameProgressSubscription.start();
+        addEventListener({
+            url: '/progress/events', eventType: 'gameProgress ' + gid,
+            path: props.location.pathname, history: props.history, handler: setGenerateWordsData
+        });
         return () => {
-            gameProgressSubscription.stop();
+            removeEventListener({
+                url: '/progress/events', eventType: 'gameProgress ' + gid
+            });
         }
     }, []);
 

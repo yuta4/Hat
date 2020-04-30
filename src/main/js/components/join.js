@@ -2,25 +2,25 @@ import React, {useEffect, useState} from 'react';
 import {useStoreActions} from 'easy-peasy';
 import {Button, Header, Icon, Label, Menu, Segment} from 'semantic-ui-react';
 import Login from './login';
-import SSESubscription from '../sseSubscription';
-import {join, teamFormation} from '../screenNames';
+import {join} from '../screenNames';
 
 const JoinScreen = (props) => {
 
     const [gamesToJoin, setGamesToJoin] = useState(props.location.state);
     const moveToGameProgressScreen = useStoreActions(actions => actions.moveToGameProgressScreen);
     const setGameId = useStoreActions(actions => actions.setGameId);
-
-    const gamesToJoinSubscription = new SSESubscription('/game/notStarted/events', 'join',
-        setGamesToJoin, undefined, props.history);
+    const addEventListener = useStoreActions(actions => actions.addEventListener);
+    const removeEventListener = useStoreActions(actions => actions.removeEventListener);
 
     useEffect(() => {
-        console.log('JoinScreen useEffect' + {gamesToJoin});
-        gamesToJoinSubscription.start();
-
+        addEventListener({
+            url: '/game/notStarted/events', eventType: 'join',
+            path: undefined, history: props.history, handler: setGamesToJoin
+        });
         return () => {
-            console.log('JoinScreen useEffect close');
-            gamesToJoinSubscription.stop();
+            removeEventListener({
+                url: '/game/notStarted/events', eventType: 'join'
+            });
         }
     }, []);
 
@@ -46,6 +46,7 @@ const JoinScreen = (props) => {
             <Menu fluid vertical>
             {gamesToJoin.map(game => (
                 <Menu.Item
+                    key={game.gameId}
                     name={'' + game.gameId}
                     onClick={() => joinGame(game.gameId)}>
                     <Label color='yellow'>{game.login}</Label>

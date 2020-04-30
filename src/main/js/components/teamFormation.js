@@ -4,7 +4,6 @@ import {Button, Divider, Dropdown, Header, Icon, Item, Label, List, Message} fro
 import {generatingWords, teamFormation} from '../screenNames';
 import ScreenHeader from './screenHeader';
 import OwnerControls from './ownerControls';
-import SSESubscription from '../sseSubscription';
 
 const client = require('../client');
 
@@ -17,6 +16,8 @@ const TeamFormation = (props) => {
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
     const moveToJoinGameOption = useStoreActions(actions => actions.moveToJoinGameOption);
+    const addEventListener = useStoreActions(actions => actions.addEventListener);
+    const removeEventListener = useStoreActions(actions => actions.removeEventListener);
 
     const isPlayer = teams.flatMap(team => team.players).includes(login);
     const isWatcher = watchers.includes(login);
@@ -26,9 +27,6 @@ const TeamFormation = (props) => {
     console.log('TeamFormation init owner ' + owner + ' teams ' + JSON.stringify(teams) + ' watchers ' + watchers);
     console.log('TeamFormation init validation ' + validation + ' login ' + login + ' gid ' + gid);
 
-    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid,
-        setTeamFormationData, props.location.pathname, props.history);
-
     function setTeamFormationData(eventJson) {
         setOwner(eventJson.data.owner);
         setTeams(eventJson.data.teams);
@@ -37,9 +35,14 @@ const TeamFormation = (props) => {
     }
 
     useEffect(() => {
-        gameProgressSubscription.start();
+        addEventListener({
+            url: '/progress/events', eventType: 'gameProgress ' + gid,
+            path: props.location.pathname, history: props.history, handler: setTeamFormationData
+        });
         return () => {
-            gameProgressSubscription.stop();
+            removeEventListener({
+                url: '/progress/events', eventType: 'gameProgress ' + gid
+            });
             client({method: 'PUT', path: '/game/changeWatcher?value=false&gameId=' + gid}).done(response => {
                 console.log('TeamFormation useEffect clear changeWatcher = false');
             });

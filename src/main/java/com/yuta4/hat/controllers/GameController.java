@@ -116,9 +116,9 @@ public class GameController {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @GetMapping(path = "notStarted/events",
+    @GetMapping(path = "notStarted/events/{player}",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Set<JoinGameDto>>> notStartedEvents(@PathVariable String player) {
+    public Flux<ServerSentEvent<Set<JoinGameDto>>> notStartedEvents(@PathVariable(required = false) String player) {
         logger.info("notStartedEvents {}", player);
         return joinGameFlux
                 .log()

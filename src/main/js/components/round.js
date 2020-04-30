@@ -4,7 +4,6 @@ import {Button, Divider, Dropdown, Header, Icon, Item, Label, List, Message} fro
 import {generatingWords, secondRound, firstRound} from '../screenNames';
 import ScreenHeader from './screenHeader';
 import OwnerControls from './ownerControls';
-import SSESubscription from '../sseSubscription';
 
 const client = require('../client');
 
@@ -18,10 +17,10 @@ const Round = (props) => {
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
 
-    const isOwner = owner === login;
+    const addEventListener = useStoreActions(actions => actions.addEventListener);
+    const removeEventListener = useStoreActions(actions => actions.removeEventListener);
 
-    const gameProgressSubscription = new SSESubscription('/progress/events', 'gameProgress ' + gid,
-        setTeamFormationData, props.location.pathname, props.history);
+    const isOwner = owner === login;
 
     function setTeamFormationData(eventJson) {
         setOwner(eventJson.data.owner);
@@ -32,9 +31,14 @@ const Round = (props) => {
     }
 
     useEffect(() => {
-        gameProgressSubscription.start();
+        addEventListener({
+            url: '/progress/events', eventType: 'gameProgress ' + gid,
+            path: props.location.pathname, history: props.history, handler: setTeamFormationData
+        });
         return () => {
-            gameProgressSubscription.stop();
+            removeEventListener({
+                url: '/progress/events', eventType: 'gameProgress ' + gid
+            });
         }
     }, []);
 

@@ -51,7 +51,7 @@ public class GameProgressController {
         return gameProgress.getData(game);
     }
 
-    @GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = "/events/{player}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<Map<String, Object>>> getGameProgressEvents(@PathVariable(required = false) String player) {
         logger.error("getGameProgressEvents {}", player);
         return gameProgressFlux
