@@ -6,9 +6,11 @@ import com.yuta4.hat.Level;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
+import com.yuta4.hat.events.NewGameEvent;
 import com.yuta4.hat.exceptions.GameNotFoundException;
 import com.yuta4.hat.exceptions.RequestValidationException;
 import com.yuta4.hat.repositories.GameRepository;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,9 +21,11 @@ import java.util.Set;
 public class GameService {
 
     private GameRepository gameRepository;
+    private ApplicationListener<NewGameEvent> newGamesListener;
 
-    public GameService(GameRepository gameRepository) {
+    public GameService(GameRepository gameRepository, ApplicationListener<NewGameEvent> newGamesListener) {
         this.gameRepository = gameRepository;
+        this.newGamesListener = newGamesListener;
     }
 
     public Game createGame(Player player) {
@@ -30,6 +34,7 @@ public class GameService {
         game.setGameProgress(GameProgress.TEAMS_FORMATION);
         game.setWatchers(Collections.singleton(player));
         gameRepository.save(game);
+        newGamesListener.onApplicationEvent(new NewGameEvent(player));
         return game;
     }
 
@@ -37,6 +42,7 @@ public class GameService {
         validateGameOwner(player, game, "Only game owner can finish the game");
         game.setIsActive(false);
         gameRepository.save(game);
+        newGamesListener.onApplicationEvent(new NewGameEvent(player));
     }
 
     public boolean changeGameProgress(Player player, Game game, GameProgress gameProgress) {

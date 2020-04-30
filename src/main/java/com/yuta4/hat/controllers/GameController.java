@@ -1,13 +1,9 @@
 package com.yuta4.hat.controllers;
 
-import com.yuta4.hat.Level;
 import com.yuta4.hat.components.JoinGamePublisher;
 import com.yuta4.hat.dto.JoinGameDto;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
-import com.yuta4.hat.entities.Team;
-import com.yuta4.hat.entities.Word;
-import com.yuta4.hat.exceptions.NoSuchGameException;
 import com.yuta4.hat.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -15,12 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @RestController
 @RequestMapping("/game")
@@ -119,10 +118,18 @@ public class GameController {
 
     @GetMapping(path = "notStarted/events",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//            produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<ServerSentEvent<Set<JoinGameDto>>> notStartedEvents() {
-        logger.info("notStartedEvents");
-        return joinGameFlux.log();
+    public Flux<ServerSentEvent<Set<JoinGameDto>>> notStartedEvents(@PathVariable String player) {
+        logger.info("notStartedEvents {}", player);
+        return joinGameFlux
+                .log()
+                //TODO: remove
+                .doOnError(t -> logger.error("notStarted doOnError {}", player, t))
+                .doOnSubscribe(s -> logger.error("notStarted doOnSubscribe {}", player))
+                .doOnCancel(() -> logger.error("notStarted doOnCancel {}", player))
+                .doOnRequest(l -> logger.error("notStarted doOnRequest {}, {}", player, l))
+                .doOnTerminate(() -> logger.error("notStarted doOnTerminate {}", player))
+                .doOnComplete(() -> logger.error("notStarted doOnComplete {}", player))
+                .doOnNext(sse -> logger.error("notStarted doOnNext {} : {}", player, sse));
     }
 
 }

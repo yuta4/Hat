@@ -34,7 +34,7 @@ public class StaticServicesInjector {
 
     @PostConstruct
     public void postConstruct() {
-        GameProgress.setTeamService(gameProgressValidator);
+        GameProgress.setStaticDependencies(gameProgressValidator);
         Arrays.asList(GameProgress.values())
                 .forEach(g -> {
                     if(g.equals(GameProgress.FIRST_ROUND)) {

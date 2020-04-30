@@ -52,9 +52,18 @@ public class GameProgressController {
     }
 
     @GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Map<String, Object>>> getGameProgressEvents() {
-        logger.error("getGameProgressEvents");
-        return gameProgressFlux.log();
+    public Flux<ServerSentEvent<Map<String, Object>>> getGameProgressEvents(@PathVariable(required = false) String player) {
+        logger.error("getGameProgressEvents {}", player);
+        return gameProgressFlux
+                .log()
+                //TODO: remove
+                .doOnError(t -> logger.error("getGameProgressEvents doOnError {}", player, t))
+                .doOnSubscribe(s -> logger.error("getGameProgressEvents doOnSubscribe {}", player))
+                .doOnCancel(() -> logger.error("getGameProgressEvents doOnCancel {}", player))
+                .doOnRequest(l -> logger.error("getGameProgressEvents doOnRequest {}, {}", player, l))
+                .doOnTerminate(() -> logger.error("getGameProgressEvents doOnTerminate {}", player))
+                .doOnComplete(() -> logger.error("getGameProgressEvents doOnComplete {}", player))
+                .doOnNext(sse -> logger.error("getGameProgressEvents doOnNext {} : {}", player, sse));
     }
 
     @PutMapping("move")

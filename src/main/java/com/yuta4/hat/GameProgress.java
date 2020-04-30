@@ -32,7 +32,7 @@ public enum GameProgress {
     private final Converter<Game, ? extends ScreenDto> dataConverter;
     private Consumer<Game> progressProcessor;
 
-    public static void setTeamService(GameProgressValidator gameProgressValidator) {
+    public static void setStaticDependencies(GameProgressValidator gameProgressValidator) {
         GameProgress.gameProgressValidator = gameProgressValidator;
     }
 
