@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@ToString(of = {"id", "players"})
+@ToString(of = {"id", "players", "playerTurn", "score"})
 @EqualsAndHashCode(of = {"game", "players"})
 public class Team {
 
@@ -35,5 +35,5 @@ public class Team {
     @ManyToOne
     private Player playerTurn;
 
-    private Short score;
+    private Short score = 0;
 }

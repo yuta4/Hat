@@ -4,18 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
+import com.yuta4.hat.TurnStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Data
-@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn"})
+@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn", "turnStatus", "turnEndTime", "pausedTimeRemains"})
 @EqualsAndHashCode(of = {"id"})
 public class Game {
 
@@ -72,4 +75,10 @@ public class Game {
     @CollectionTable(name = "game_words_level")
     @Column(name = "words_level")
     private Set<Level> wordsLevels = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    private TurnStatus turnStatus = TurnStatus.NOT_STARTED;
+
+    private LocalDateTime turnEndTime;
+    private Duration pausedTimeRemains;
 }

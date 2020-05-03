@@ -83,6 +83,29 @@ const GenerateWords = (props) => {
                           headerName={generatingWords} owner={owner} gid={gid}/>
 
             <Form>
+                <Form.Group grouped>
+                    <label>Words language</label>
+                    {
+                        languages.map(language =>
+                            <Form.Checkbox disabled={!isOwner} checked={language.value} label={language.name}
+                                           key={language.name}
+                                           onChange={(event, data) => {
+                                               languageChange(language.name, data.checked)
+                                           }}/>
+                        )
+                    }
+                </Form.Group>
+                <Form.Group grouped>
+                    <label>Words level</label>
+                    {
+                        levels.map(level =>
+                            <Form.Checkbox disabled={!isOwner} checked={level.value} label={level.name} key={level.name}
+                                           onChange={(event, data) => {
+                                               levelChange(level.name, data.checked)
+                                           }}/>
+                        )
+                    }
+                </Form.Group>
                 <Form.Group>
                     {
                         isOwner &&
@@ -101,31 +124,7 @@ const GenerateWords = (props) => {
                     header='Total words'
                     content={gameWords}
                 />
-                <Form.Group grouped>
-                    <label>Words level</label>
-                    {
-                        levels.map(level =>
-                            <Form.Checkbox disabled={!isOwner} checked={level.value} label={level.name} key={level.name}
-                                           onChange={(event, data) => {
-                                               levelChange(level.name, data.checked)
-                                           }}/>
-                        )
-                    }
-                </Form.Group>
-                <Form.Group grouped>
-                    <label>Words language</label>
-                    {
-                        languages.map(language =>
-                            <Form.Checkbox disabled={!isOwner} checked={language.value} label={language.name}
-                                           key={language.name}
-                                           onChange={(event, data) => {
-                                               languageChange(language.name, data.checked)
-                                           }}/>
-                        )
-                    }
-                </Form.Group>
             </Form>
-
             {
                 isOwner &&
                 <OwnerControls validation={validation} nextScreen={firstRound}

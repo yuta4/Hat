@@ -3,16 +3,20 @@ package com.yuta4.hat.services;
 import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
+import com.yuta4.hat.TurnStatus;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.events.NewGameEvent;
 import com.yuta4.hat.exceptions.GameNotFoundException;
 import com.yuta4.hat.exceptions.RequestValidationException;
+import com.yuta4.hat.exceptions.TurnException;
 import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -22,10 +26,12 @@ public class GameService {
 
     private GameRepository gameRepository;
     private ApplicationListener<NewGameEvent> newGamesListener;
+    private GameWordService gameWordService;
 
-    public GameService(GameRepository gameRepository, ApplicationListener<NewGameEvent> newGamesListener) {
+    public GameService(GameRepository gameRepository, ApplicationListener<NewGameEvent> newGamesListener, GameWordService gameWordService) {
         this.gameRepository = gameRepository;
         this.newGamesListener = newGamesListener;
+        this.gameWordService = gameWordService;
     }
 
     public Game createGame(Player player) {
@@ -151,5 +157,48 @@ public class GameService {
         if (!game.getOwner().equals(player)) {
             throw new RequestValidationException(s);
         }
+    }
+
+    public void unPauseTurn(Long gameId) {
+        Game game = getGameById(gameId);
+        if(!TurnStatus.PAUSED.equals(game.getTurnStatus()) ||
+            game.getTurnEndTime() == null || game.getPausedTimeRemains() == null) {
+            throw new TurnException(String.format("Can't unpause game %d : %s, %s, %s ",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
+        }
+        game.setTurnEndTime(LocalDateTime.now().plus(game.getPausedTimeRemains()));
+        game.setTurnStatus(TurnStatus.ACTIVE);
+        game.setPausedTimeRemains(null);
+        gameRepository.save(game);
+    }
+
+    public void pauseTurn(Long gameId) {
+        Game game = getGameById(gameId);
+        if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
+                game.getTurnEndTime() == null || game.getPausedTimeRemains() != null) {
+            throw new TurnException(String.format("Can't unpause game %d : %s, %s, %s ",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
+        }
+        game.setPausedTimeRemains(Duration.between(LocalDateTime.now(), game.getTurnEndTime()));
+        game.setTurnStatus(TurnStatus.PAUSED);
+        gameRepository.save(game);
+    }
+
+    public void startTurn(Long gameId) {
+        Game game = getGameById(gameId);
+        if(!TurnStatus.NOT_STARTED.equals(game.getTurnStatus()) ||
+                game.getTurnEndTime() != null || game.getPausedTimeRemains() != null) {
+            throw new TurnException(String.format("Can't start game %d : %s, %s, %s ",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
+        }
+        game.setTurnEndTime(LocalDateTime.now().plus(Duration.ofMinutes(1)));
+        game.setTurnStatus(TurnStatus.ACTIVE);
+        gameRepository.save(game);
+    }
+
+    public void finishTurn(Long gameId, Set<String> guessedWords, Team playerTeam) {
+        Game game = getGameById(gameId);
+        moveTeamTurn(game);
+        gameWordService.markAsGuessed(guessedWords, playerTeam);
     }
 }

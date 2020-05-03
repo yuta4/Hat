@@ -171,7 +171,7 @@ const Team = ((props) => {
             <Header block as='h2'>
                 <Item>
                     <Icon color={'violet'} name='address card'/>
-                    Team {team.name}
+                    {team.name}
                     {
                         isOwner &&
                         <Button color={'red'} floated={'right'} icon={'remove circle'} onClick={deleteTeam}/>

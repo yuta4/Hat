@@ -17,25 +17,12 @@ public class TeamsScreenDtoConverter implements Converter<Game, TeamsScreenDto> 
 
     @Override
     public TeamsScreenDto convert(Game game) {
-        Set<TeamDto> teams = game.getTeams() == null ? Collections.EMPTY_SET :
-                game.getTeams().stream()
-                        .map(team -> {
-                            Set<String> teamPlayers = team.getPlayers().stream()
-                                    .map(Player::getLogin)
-                                    .collect(Collectors.toCollection(LinkedHashSet::new));
-                            String teamName = getTeamName(team);
-                            return new TeamDto(team.getId(), teamName, teamPlayers);
-                        })
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<TeamDto> teams = TeamConverterUtil.convertToTeamDto(game);
         return new TeamsScreenDto(teams,
                 game.getOwner().getLogin(),
                 game.getWatchers().stream()
                         .map(Player::getLogin)
                         .collect(Collectors.toCollection(LinkedHashSet::new)));
-    }
-
-    private String getTeamName(Team team) {
-        return team.getName() == null ? team.getId().toString() : team.getName();
     }
 
 }

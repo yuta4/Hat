@@ -1,17 +1,18 @@
 package com.yuta4.hat.converter;
 
 
+import com.yuta4.hat.TurnStatus;
 import com.yuta4.hat.dto.RoundScreenDto;
 import com.yuta4.hat.dto.TeamDto;
 import com.yuta4.hat.entities.Game;
-import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static com.yuta4.hat.converter.TeamConverterUtil.getTeamName;
 
 public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> {
 
@@ -23,35 +24,26 @@ public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> 
 
     @Override
     public RoundScreenDto convert(Game game) {
-        Set<TeamDto> teams = game.getTeams() == null ? Collections.EMPTY_SET :
-                game.getTeams().stream()
-                        .map(team -> {
-                            Set<String> teamPlayers = team.getPlayers().stream()
-                                    .map(Player::getLogin)
-                                    .collect(Collectors.toCollection(LinkedHashSet::new));
-                            String teamName = getTeamName(team);
-                            return new TeamDto(team.getId(), teamName, teamPlayers);
-                        })
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<TeamDto> teams = TeamConverterUtil.convertToTeamDto(game);
 
         Team teamTurn = game.getTeamTurn();
         String playerTurn = teamTurn == null ? "team turn not set" :
                 teamTurn.getPlayerTurn() == null ? "player turn not set" :
                 teamTurn.getPlayerTurn().getLogin();
+        Duration turnTimeRemaining = game.getTurnEndTime() == null ? Duration.ofMinutes(1)
+                : Duration.between(LocalDateTime.now(), game.getTurnEndTime());
         return new RoundScreenDto(game.getOwner().getLogin(),
                 teams,
                 getTeamName(teamTurn),
                 playerTurn,
-                round
+                round,
+                game.getTurnStatus() == null ? TurnStatus.NOT_STARTED.toString()
+                        : game.getTurnStatus().toString(),
+                turnTimeRemaining.getSeconds()
         );
     }
 
-    private String getTeamName(Team team) {
-        if(team == null) {
-            return "team turn not set";
-        }
-        return team.getName() == null ? team.getId().toString() : team.getName();
-    }
+
 
 
 }

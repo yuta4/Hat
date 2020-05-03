@@ -50,7 +50,7 @@ public class GameWordService {
                 .collect(Collectors.toSet());
     }
 
-    public void markAsGuessed(List<String> strings, Team team) {
+    public void markAsGuessed(Set<String> strings, Team team) {
         strings.stream()
                 .map(str -> gameWordRepository.findByWord(
                         wordRepository.findByString(str)
@@ -58,7 +58,7 @@ public class GameWordService {
                         .orElseThrow(() -> new WordException(String.format("Can't find word %s in this game", str))))
                 .forEach(gameWord -> {
                     gameWord.setTeam(team);
-                    gameWordRepository.save(gameWord);
+//                    gameWordRepository.save(gameWord);
                 });
     }
 }

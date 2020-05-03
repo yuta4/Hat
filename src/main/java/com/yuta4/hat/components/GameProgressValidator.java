@@ -4,8 +4,8 @@ import com.yuta4.hat.GameProgress;
 import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
 import com.yuta4.hat.entities.Game;
-import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
+import com.yuta4.hat.services.GameWordService;
 import com.yuta4.hat.services.TeamService;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +17,11 @@ import java.util.Set;
 public class GameProgressValidator {
 
     private TeamService teamService;
+    private GameWordService gameWordService;
 
-    public GameProgressValidator(TeamService teamService) {
+    public GameProgressValidator(TeamService teamService, GameWordService gameWordService) {
         this.teamService = teamService;
+        this.gameWordService = gameWordService;
     }
 
     public String validateRequirements(Game game) {
@@ -33,13 +35,9 @@ public class GameProgressValidator {
                 errorOptional = checkGeneratingWords(game);
                 break;
             case FIRST_ROUND:
-                errorOptional = checkFirstRound(game);
-                break;
             case SECOND_ROUND:
-                errorOptional = checkSecondRound();
-                break;
             case THIRD_ROUND:
-                errorOptional = checkThirdRound();
+                errorOptional = checkRound(game);
                 break;
             case SUMMERY_VIEW:
                 errorOptional = checkSummaryView();
@@ -77,15 +75,13 @@ public class GameProgressValidator {
         return Optional.empty();
     }
 
-    private Optional<String> checkFirstRound(Game game) {
-        return Optional.empty();
-    }
-
-    private Optional<String> checkSecondRound() {
-        return Optional.empty();
-    }
-
-    private Optional<String> checkThirdRound() {
+    private Optional<String> checkRound(Game game) {
+        if(!game.getGameProgress().equals(GameProgress.THIRD_ROUND)) {
+            return Optional.of("Not all rounds are finished");
+        }
+        if(!gameWordService.getNotGuessedWords(game).isEmpty()) {
+            return Optional.of("Not all words where guessed");
+        }
         return Optional.empty();
     }
 
