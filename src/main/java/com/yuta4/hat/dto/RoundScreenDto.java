@@ -11,7 +11,7 @@ public class RoundScreenDto implements ScreenDto {
 
     private String owner;
     private Set<TeamDto> teams;
-    private String teamTurn;
+    private Long teamTurn;
     private String playerTurn;
     private Integer round;
     private String turnStatus;

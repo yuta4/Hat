@@ -3,6 +3,7 @@ package com.yuta4.hat;
 import com.yuta4.hat.components.GameProgressValidator;
 import com.yuta4.hat.converter.GenerateWordsDtoConverter;
 import com.yuta4.hat.converter.RoundScreenDtoConverter;
+import com.yuta4.hat.converter.SummaryScreenDtoConverter;
 import com.yuta4.hat.converter.TeamsScreenDtoConverter;
 import com.yuta4.hat.dto.ScreenDto;
 import com.yuta4.hat.entities.Game;
@@ -24,7 +25,7 @@ public enum GameProgress {
     THIRD_ROUND("Third round", "/third/",
             new RoundScreenDtoConverter(3)),
     SUMMERY_VIEW("Summary", "/summary/",
-            game -> null);
+            new SummaryScreenDtoConverter());
 
     private final String path;
     private static GameProgressValidator gameProgressValidator;

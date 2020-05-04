@@ -28,7 +28,7 @@ const OwnerControls = (props) => {
         if (window.confirm('Are you sure you wish to close this game?')) {
             client({method: 'PUT', path: '/game/finish?gameId=' + gid}).done(() => {
                 console.log('closeGame');
-                history.push({pathname: '/'});
+                // history.push({pathname: '/'});
             });
         }
     }

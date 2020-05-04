@@ -22,4 +22,6 @@ public class GameWord {
 
     @ManyToOne
     private Team team;
+
+    private Boolean currentTurnGuessed;
 }

@@ -44,9 +44,9 @@ public class FirstRoundProcessor implements Consumer<Game> {
         if(game.getTeamTurn() == null) {
             gameService.moveTeamTurn(game);
         }
-        if(game.getTeamTurn().getPlayerTurn() == null) {
-            teamService.movePlayerTurn(game.getTeamTurn());
-        }
+        game.getTeams().stream()
+                .filter(team -> team.getPlayerTurn() == null)
+                .forEach(teamService::movePlayerTurn);
     }
 
     private void generateWordsIfNeeded(Game game) {

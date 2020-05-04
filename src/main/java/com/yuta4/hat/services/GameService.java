@@ -47,6 +47,7 @@ public class GameService {
     public void finishGameIfPermitted(Game game, Player player) {
         validateGameOwner(player, game, "Only game owner can finish the game");
         game.setIsActive(false);
+        game.setGameProgress(GameProgress.SUMMERY_VIEW);
         gameRepository.save(game);
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
     }
@@ -163,7 +164,7 @@ public class GameService {
         Game game = getGameById(gameId);
         if(!TurnStatus.PAUSED.equals(game.getTurnStatus()) ||
             game.getTurnEndTime() == null || game.getPausedTimeRemains() == null) {
-            throw new TurnException(String.format("Can't unpause game %d : %s, %s, %s ",
+            throw new TurnException(String.format("Can't unpause turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
         }
         game.setTurnEndTime(LocalDateTime.now().plus(game.getPausedTimeRemains()));
@@ -176,7 +177,7 @@ public class GameService {
         Game game = getGameById(gameId);
         if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() == null || game.getPausedTimeRemains() != null) {
-            throw new TurnException(String.format("Can't unpause game %d : %s, %s, %s ",
+            throw new TurnException(String.format("Can't pause turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
         }
         game.setPausedTimeRemains(Duration.between(LocalDateTime.now(), game.getTurnEndTime()));
@@ -188,7 +189,7 @@ public class GameService {
         Game game = getGameById(gameId);
         if(!TurnStatus.NOT_STARTED.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() != null || game.getPausedTimeRemains() != null) {
-            throw new TurnException(String.format("Can't start game %d : %s, %s, %s ",
+            throw new TurnException(String.format("Can't start turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
         }
         game.setTurnEndTime(LocalDateTime.now().plus(Duration.ofMinutes(1)));
@@ -196,9 +197,29 @@ public class GameService {
         gameRepository.save(game);
     }
 
-    public void finishTurn(Long gameId, Set<String> guessedWords, Team playerTeam) {
+    public void finishTurn(Long gameId) {
         Game game = getGameById(gameId);
+        if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
+            game.getTurnEndTime() == null ||
+                game.getTurnEndTime().isAfter(LocalDateTime.now())) {
+            throw new TurnException(String.format("Can't finish turn %d : %s, %s",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime()));
+        }
+        game.setTurnStatus(TurnStatus.APPROVING);
+        game.setTurnEndTime(null);
+        gameRepository.save(game);
+    }
+
+    public void approveTurn(Long gameId, Set<String> guessedWords, Team playerTeam) {
+        Game game = getGameById(gameId);
+        if(!TurnStatus.APPROVING.equals(game.getTurnStatus()) ||
+                game.getTurnEndTime() != null) {
+            throw new TurnException(String.format("Can't approve turn %d : %s, %s",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime()));
+        }
         moveTeamTurn(game);
-        gameWordService.markAsGuessed(guessedWords, playerTeam);
+        gameWordService.markAsGuessed(game, guessedWords, playerTeam);
+        game.setTurnStatus(TurnStatus.NOT_STARTED);
+        gameRepository.save(game);
     }
 }

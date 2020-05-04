@@ -34,7 +34,7 @@ public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> 
                 : Duration.between(LocalDateTime.now(), game.getTurnEndTime());
         return new RoundScreenDto(game.getOwner().getLogin(),
                 teams,
-                getTeamName(teamTurn),
+                teamTurn != null ? teamTurn.getId() : null,
                 playerTurn,
                 round,
                 game.getTurnStatus() == null ? TurnStatus.NOT_STARTED.toString()
