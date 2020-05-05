@@ -1,4 +1,4 @@
-package com.yuta4.hat.converter;
+package com.yuta4.hat.converters;
 
 
 import com.yuta4.hat.TurnStatus;
@@ -11,8 +11,6 @@ import org.springframework.core.convert.converter.Converter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Set;
-
-import static com.yuta4.hat.converter.TeamConverterUtil.getTeamName;
 
 public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> {
 

@@ -48,6 +48,7 @@ public class GameService {
         validateGameOwner(player, game, "Only game owner can finish the game");
         game.setIsActive(false);
         game.setGameProgress(GameProgress.SUMMERY_VIEW);
+        game.getWatchers().clear();
         gameRepository.save(game);
         newGamesListener.onApplicationEvent(new NewGameEvent(player));
     }
@@ -220,6 +221,12 @@ public class GameService {
         moveTeamTurn(game);
         gameWordService.markAsGuessed(game, guessedWords, playerTeam);
         game.setTurnStatus(TurnStatus.NOT_STARTED);
+        gameRepository.save(game);
+    }
+
+    public void clearWatchers(Long id) {
+        Game game = getGameById(id);
+        game.getWatchers().clear();
         gameRepository.save(game);
     }
 }

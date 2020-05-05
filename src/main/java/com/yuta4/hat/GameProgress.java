@@ -1,10 +1,10 @@
 package com.yuta4.hat;
 
 import com.yuta4.hat.components.GameProgressValidator;
-import com.yuta4.hat.converter.GenerateWordsDtoConverter;
-import com.yuta4.hat.converter.RoundScreenDtoConverter;
-import com.yuta4.hat.converter.SummaryScreenDtoConverter;
-import com.yuta4.hat.converter.TeamsScreenDtoConverter;
+import com.yuta4.hat.converters.GenerateWordsDtoConverter;
+import com.yuta4.hat.converters.RoundScreenDtoConverter;
+import com.yuta4.hat.converters.SummaryScreenDtoConverter;
+import com.yuta4.hat.converters.TeamsScreenDtoConverter;
 import com.yuta4.hat.dto.ScreenDto;
 import com.yuta4.hat.entities.Game;
 import org.springframework.core.convert.converter.Converter;

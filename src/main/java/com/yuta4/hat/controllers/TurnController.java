@@ -1,6 +1,5 @@
 package com.yuta4.hat.controllers;
 
-import com.yuta4.hat.converter.TurnWordsDtoConverter;
 import com.yuta4.hat.dto.TurnWordDto;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
@@ -14,7 +13,6 @@ import com.yuta4.hat.services.TeamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

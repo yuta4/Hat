@@ -51,8 +51,7 @@ public class Game {
     @Enumerated(EnumType.STRING)
     private GameProgress gameProgress;
 
-    //TODO: should be @OneToMany
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "game_watcher",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id"))

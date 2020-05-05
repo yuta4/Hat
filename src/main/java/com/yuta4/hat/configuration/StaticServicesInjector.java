@@ -1,8 +1,9 @@
 package com.yuta4.hat.configuration;
 
 import com.yuta4.hat.GameProgress;
-import com.yuta4.hat.components.FirstRoundProcessor;
 import com.yuta4.hat.components.GameProgressValidator;
+import com.yuta4.hat.components.screen.processors.FirstRoundProcessor;
+import com.yuta4.hat.components.screen.processors.GenerateWordsProcessor;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.GameWordService;
@@ -37,11 +38,20 @@ public class StaticServicesInjector {
         GameProgress.setStaticDependencies(gameProgressValidator);
         Arrays.asList(GameProgress.values())
                 .forEach(g -> {
-                    if(g.equals(GameProgress.FIRST_ROUND)) {
-                        g.setProgressProcessor(
-                                new FirstRoundProcessor(teamService, gameWordService, wordService, gameService));
-                    } else {
-                        g.setProgressProcessor(DEFAULT_PROCESSOR);
+                    switch (g) {
+                        case FIRST_ROUND:
+                            g.setProgressProcessor(
+                                    new FirstRoundProcessor(teamService, gameWordService, wordService, gameService)
+                            );
+                            break;
+                        case GENERATING_WORDS:
+                            g.setProgressProcessor(
+                                    new GenerateWordsProcessor(gameService)
+                            );
+                            break;
+                        default:
+                            g.setProgressProcessor(DEFAULT_PROCESSOR);
+                            break;
                     }
                 });
     }

@@ -29,8 +29,8 @@ public class WordService {
         }
         randomWords.forEach(word -> {
             word.setUsed(word.getUsed() + 1);
-            wordRepository.save(word);
         });
+        wordRepository.saveAll(randomWords);
         return randomWords;
     }
 

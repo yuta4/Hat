@@ -1,4 +1,4 @@
-package com.yuta4.hat.converter;
+package com.yuta4.hat.converters;
 
 import com.yuta4.hat.dto.TurnWordDto;
 import com.yuta4.hat.entities.GameWord;
