@@ -20,6 +20,7 @@ const Round = (props) => {
     const gid = useStoreState(state => state.gid);
 
     const [lastNotGuessedWord, setLastNotGuessedWord] = useState();
+    const [turnWords, setTurnWords] = useState();
     const [wordsForApprovement, setWordsForApprovement] = useState();
 
     const addEventListener = useStoreActions(actions => actions.addEventListener);
@@ -33,7 +34,7 @@ const Round = (props) => {
     const turnControlsEnabled = isPlayerTurn && turnStatus !== 'APPROVING';
 
     const needApprovement = isPlayerTurn && turnStatus === 'APPROVING';
-    if (needApprovement) {
+    if (needApprovement && wordsForApprovement === undefined) {
         client({
             method: 'GET',
             path: '/turn/words/approvement?gameId=' + gid
@@ -83,22 +84,22 @@ const Round = (props) => {
                 setTimeout(() => {
                     setTurnSecondsRemaining(turnSecondsRemaining - 1);
                 }, 1000)
-            } else {
+            } else if(isPlayerTurn) {
                 client({
                     method: 'PUT',
                     path: '/turn/finish?gameId=' + gid + '&guessedWords=' + []
                 }).done(() => {
-                    console.log('team reduced');
+                    console.log('turn finish');
+                    setTurnWords(undefined);
+                    setLastNotGuessedWord(undefined);
                 });
             }
         }
     }, [isActiveTurn, turnSecondsRemaining]);
 
-    let turnWords;
-
-    function setLastNotGuessedRandomly() {
-        if (lastNotGuessedWord === undefined) {
-            const i = Math.floor(Math.random() * (turnWords.size() - 1));
+    function setLastNotGuessedRandomly(force) {
+        if (force || lastNotGuessedWord === undefined) {
+            const i = Math.floor(Math.random() * (turnWords.length - 1));
             setLastNotGuessedWord(turnWords[i]);
         }
     }
@@ -122,8 +123,8 @@ const Round = (props) => {
                     path: '/turn/start?gameId=' + gid + '&wasPaused=' + isPausedTurn
                 }).done((response) => {
                     console.log('turn/start, paused ' + isPausedTurn);
-                    turnWords = response.entity;
-                    setLastNotGuessedRandomly();
+                    setTurnWords(response.entity);
+                    setLastNotGuessedRandomly(false);
                 }, (response) => {
                     console.log('turn/start error, paused' + isPausedTurn);
                 });
@@ -146,6 +147,14 @@ const Round = (props) => {
         }, (response) => {
             console.log('turn/approve error');
         });
+        setWordsForApprovement(undefined);
+    }
+
+    function changeWordGuessedInApproveModal(word, checked) {
+        const toChange = wordsForApprovement;
+        const indexOfWord = toChange.indexOf(word);
+        toChange[indexOfWord].isGuessed = checked;
+        setWordsForApprovement([...toChange]);
     }
 
     function renderModal() {
@@ -161,14 +170,17 @@ const Round = (props) => {
             <Modal.Content>
                 {
                     wordsPresent &&
-                    <Form>
+                    <Form inverted>
                         <Form.Group grouped>
-                            wordsForApprovement.map(word =>
-                            <Form.Checkbox checked={word.isGuessed} label={word.word}
-                                           key={word.word}
-                                           onChange={(event, data) => {
-                                               wordsForApprovement[word.word] = data.checked;
-                                           }}/>
+                            {
+                                wordsForApprovement.map(word =>
+                                    <Form.Checkbox checked={word.isGuessed} label={word.word}
+                                                   key={word.word}
+                                                   onChange={(event, data) => {
+                                                       // word.isGuessed = data.checked;
+                                                       changeWordGuessedInApproveModal(word, data.checked);
+                                                   }}/>)
+                            }
                         </Form.Group>
                     </Form>
                 }
@@ -185,11 +197,25 @@ const Round = (props) => {
         </Modal>
     }
 
+    function markWord(word, isGuessed) {
+        client({
+            method: 'PUT',
+            path: '/turn/mark?gameId=' + gid + '&teamId=' + teamTurn
+                + '&word=' + word + '&isGuessed=' + isGuessed
+        }).done((response) => {
+            console.log('turn/markWord');
+        }, (response) => {
+            console.log('turn/markWord error');
+        });
+        setTurnWords(turnWords.filter(w => w !== word));
+        setLastNotGuessedRandomly(true);
+    }
+
     function renderWordToGuess() {
         return <div>
-            <Button color='red'/>
+            <Button onClick={() => {markWord(lastNotGuessedWord, false)}} color='red'/>
             <Label>{lastNotGuessedWord}</Label>
-            <Button color='green'/>
+            <Button onClick={() => {markWord(lastNotGuessedWord, true)}} color='green'/>
         </div>
     }
 

@@ -9,6 +9,7 @@ import com.yuta4.hat.repositories.GameRepository;
 import com.yuta4.hat.repositories.GameWordRepository;
 import com.yuta4.hat.repositories.WordRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,7 @@ public class GameWordService {
                 .collect(Collectors.toSet());
     }
 
+    @Transactional
     public void markAsGuessed(Game game, Set<String> strings, Team team) {
         gameWordRepository.clearCurrentTurnWords(team.getGame());
         strings.stream()

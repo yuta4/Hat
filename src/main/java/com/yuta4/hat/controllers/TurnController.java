@@ -67,7 +67,8 @@ public class TurnController {
 
     private void validatePlayer(Player player, Game game, Team team) {
         validatePlayer(player, game);
-        if (!team.getGame().equals(game) || !team.getPlayers().contains(player)) {
+        if (!team.getGame().equals(game) ||
+                !team.getPlayers().contains(player)) {
             throw new RequestValidationException(
                     String.format("Wrong team request : %s, %s", team, game));
         }
@@ -116,8 +117,9 @@ public class TurnController {
         Game game = gameService.getGameById(gameId);
         Team team = teamService.getTeamOrThrow(teamId);
         validatePlayer(player, game, team);
-        teamService.movePlayerTurn(game.getTeamTurn());
+        Team lastTeamTurn = game.getTeamTurn();
         gameService.approveTurn(gameId, guessedWords, team);
+        teamService.movePlayerTurn(lastTeamTurn);
         return ResponseEntity.ok().build();
     }
 

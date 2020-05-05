@@ -2,15 +2,13 @@ package com.yuta4.hat.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-@EqualsAndHashCode(of = "login")
+@EqualsAndHashCode(of = "id")
 @ToString(of = {"name", "login"})
 public class Player {
 

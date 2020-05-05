@@ -1,4 +1,4 @@
-package com.yuta4.hat.components;
+package com.yuta4.hat.components.screen.processors;
 
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;

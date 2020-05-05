@@ -202,7 +202,7 @@ public class GameService {
         Game game = getGameById(gameId);
         if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
             game.getTurnEndTime() == null ||
-                game.getTurnEndTime().isAfter(LocalDateTime.now())) {
+                game.getTurnEndTime().minusSeconds(1).isAfter(LocalDateTime.now())) {
             throw new TurnException(String.format("Can't finish turn %d : %s, %s",
                     gameId, game.getTurnStatus(), game.getTurnEndTime()));
         }
