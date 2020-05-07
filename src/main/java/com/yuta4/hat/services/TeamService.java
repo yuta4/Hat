@@ -116,4 +116,10 @@ public class TeamService {
         }
         return isRemoved;
     }
+
+    public void addScore(Long id, long scoreToAdd) {
+        Team team = getTeamOrThrow(id);
+        team.setScore(team.getScore() + scoreToAdd);
+        teamRepository.save(team);
+    }
 }

@@ -35,5 +35,5 @@ public class Team {
     @ManyToOne
     private Player playerTurn;
 
-    private Short score = 0;
+    private Long score = 0L;
 }

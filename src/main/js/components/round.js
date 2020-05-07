@@ -10,10 +10,12 @@ const client = require('../client');
 const Round = (props) => {
 
     const [owner, setOwner] = useState(props.location.state.data.owner);
+    const [allowSkipWords, setAllowSkipWords] = useState(props.location.state.data.allowSkipWords);
     const [teams, setTeams] = useState(props.location.state.data.teams);
     const [teamTurn, setTeamTurn] = useState(props.location.state.data.teamTurn);
     const [playerTurn, setPlayerTurn] = useState(props.location.state.data.playerTurn);
     const [turnStatus, setTurnStatus] = useState(props.location.state.data.turnStatus);
+    const [turnGuessesCount, setTurnGuessesCount] = useState(props.location.state.data.turnGuessesCount);
     const [turnSecondsRemaining, setTurnSecondsRemaining] = useState(props.location.state.data.turnSecondsRemaining);
     const [validation, setValidation] = useState(props.location.state.validation);
     const login = useStoreState(state => state.login);
@@ -40,7 +42,7 @@ const Round = (props) => {
             path: '/turn/words/approvement?gameId=' + gid
         }).done((response) => {
             setWordsForApprovement(response.entity);
-            console.log('turn words');
+            console.log('turn words ' + JSON.stringify(response.entity));
         }, (response) => {
             console.log('turn words exception');
         });
@@ -58,10 +60,12 @@ const Round = (props) => {
 
     function setRoundData(eventJson) {
         setOwner(eventJson.data.owner);
+        setAllowSkipWords(eventJson.data.allowSkipWords);
         setTeams(eventJson.data.teams);
         setTeamTurn(eventJson.data.teamTurn);
         setPlayerTurn(eventJson.data.playerTurn);
         setTurnStatus(eventJson.data.turnStatus);
+        setTurnGuessesCount(eventJson.data.turnGuessesCount);
         setTurnSecondsRemaining(eventJson.data.turnSecondsRemaining);
         setValidation(eventJson.validation);
     }
@@ -84,7 +88,7 @@ const Round = (props) => {
                 setTimeout(() => {
                     setTurnSecondsRemaining(turnSecondsRemaining - 1);
                 }, 1000)
-            } else if(isPlayerTurn) {
+            } else if (isPlayerTurn) {
                 client({
                     method: 'PUT',
                     path: '/turn/finish?gameId=' + gid + '&guessedWords=' + []
@@ -97,10 +101,10 @@ const Round = (props) => {
         }
     }, [isActiveTurn, turnSecondsRemaining]);
 
-    function setLastNotGuessedRandomly(force) {
+    function setLastNotGuessedRandomly(words, force) {
         if (force || lastNotGuessedWord === undefined) {
-            const i = Math.floor(Math.random() * (turnWords.length - 1));
-            setLastNotGuessedWord(turnWords[i]);
+            const i = Math.floor(Math.random() * (words.length - 1));
+            setLastNotGuessedWord(words[i]);
         }
     }
 
@@ -124,7 +128,7 @@ const Round = (props) => {
                 }).done((response) => {
                     console.log('turn/start, paused ' + isPausedTurn);
                     setTurnWords(response.entity);
-                    setLastNotGuessedRandomly(false);
+                    setLastNotGuessedRandomly(response.entity, false);
                 }, (response) => {
                     console.log('turn/start error, paused' + isPausedTurn);
                 });
@@ -207,16 +211,32 @@ const Round = (props) => {
         }, (response) => {
             console.log('turn/markWord error');
         });
-        setTurnWords(turnWords.filter(w => w !== word));
-        setLastNotGuessedRandomly(true);
+        const words = turnWords.filter(w => w !== word);
+        setTurnWords(words);
+        setLastNotGuessedRandomly(words, true);
     }
 
     function renderWordToGuess() {
-        return <div>
-            <Button onClick={() => {markWord(lastNotGuessedWord, false)}} color='red'/>
-            <Label>{lastNotGuessedWord}</Label>
-            <Button onClick={() => {markWord(lastNotGuessedWord, true)}} color='green'/>
-        </div>
+        return <Grid>
+            {
+                allowSkipWords &&
+                <Grid.Column width={3}>
+                    <Button onClick={() => {
+                        markWord(lastNotGuessedWord, false)
+                    }} icon='close' color='red'/>
+                </Grid.Column>
+            }
+            <Grid.Column width={9}>
+                <Button basic fluid>{lastNotGuessedWord}</Button>
+            </Grid.Column>
+            <Grid.Column width={3}>
+                <Button onClick={() => {
+                    markWord(lastNotGuessedWord, true)
+                }} icon='checkmark' color='green'>
+                    {turnGuessesCount}
+                </Button>
+            </Grid.Column>
+        </Grid>
     }
 
     return (
@@ -239,14 +259,19 @@ const Round = (props) => {
                                         <Header as='h2'>
                                             {team.name}
                                         </Header>
-                                        <br/>
+                                        <Divider hidden/>
                                         {
                                             (isPlayerTurn && isActiveTurn) &&
                                             renderWordToGuess()
                                         }
                                         {
+                                            !(isPlayerTurn && isActiveTurn) &&
+                                            <Button basic fluid>{turnGuessesCount}</Button>
+                                        }
+                                        <Divider hidden/>
+                                        {
                                             turnControlsEnabled &&
-                                            <Button as='div' labelPosition='right'>
+                                            <Button as='div' fluid labelPosition='right'>
                                                 <Button onClick={toggleTurnStatus}
                                                         color={isActiveTurn ? 'red' : 'green'}
                                                         icon>

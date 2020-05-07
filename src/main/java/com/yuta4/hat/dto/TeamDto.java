@@ -13,5 +13,5 @@ public class TeamDto {
     private Long id;
     private String name;
     private Set<String> players;
-    private Short score;
+    private Long score;
 }

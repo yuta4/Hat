@@ -118,7 +118,7 @@ public class GameService {
     public void deleteTeam(Team teamToDelete) {
         Game game = teamToDelete.getGame();
         game.getTeams().remove(teamToDelete);
-        if(teamToDelete.equals(game.getTeamTurn())) {
+        if (teamToDelete.equals(game.getTeamTurn())) {
             game.setTeamTurn(null);
         }
         gameRepository.save(game);
@@ -163,8 +163,8 @@ public class GameService {
 
     public void unPauseTurn(Long gameId) {
         Game game = getGameById(gameId);
-        if(!TurnStatus.PAUSED.equals(game.getTurnStatus()) ||
-            game.getTurnEndTime() == null || game.getPausedTimeRemains() == null) {
+        if (!TurnStatus.PAUSED.equals(game.getTurnStatus()) ||
+                game.getTurnEndTime() == null || game.getPausedTimeRemains() == null) {
             throw new TurnException(String.format("Can't unpause turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
         }
@@ -176,7 +176,7 @@ public class GameService {
 
     public void pauseTurn(Long gameId) {
         Game game = getGameById(gameId);
-        if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
+        if (!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() == null || game.getPausedTimeRemains() != null) {
             throw new TurnException(String.format("Can't pause turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
@@ -188,7 +188,7 @@ public class GameService {
 
     public void startTurn(Long gameId) {
         Game game = getGameById(gameId);
-        if(!TurnStatus.NOT_STARTED.equals(game.getTurnStatus()) ||
+        if (!TurnStatus.NOT_STARTED.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() != null || game.getPausedTimeRemains() != null) {
             throw new TurnException(String.format("Can't start turn %d : %s, %s, %s ",
                     gameId, game.getTurnStatus(), game.getTurnEndTime(), game.getPausedTimeRemains()));
@@ -198,13 +198,14 @@ public class GameService {
         gameRepository.save(game);
     }
 
-    public void finishTurn(Long gameId) {
+    public void finishTurn(Long gameId, boolean noWordsLeft) {
         Game game = getGameById(gameId);
-        if(!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
-            game.getTurnEndTime() == null ||
-                game.getTurnEndTime().minusSeconds(1).isAfter(LocalDateTime.now())) {
-            throw new TurnException(String.format("Can't finish turn %d : %s, %s",
-                    gameId, game.getTurnStatus(), game.getTurnEndTime()));
+        if (!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
+                game.getTurnEndTime() == null ||
+                (!noWordsLeft &&
+                        game.getTurnEndTime().minusSeconds(1).isAfter(LocalDateTime.now()))) {
+            throw new TurnException(String.format("Can't finish turn %d : %s, %s, %s",
+                    gameId, game.getTurnStatus(), game.getTurnEndTime(), noWordsLeft));
         }
         game.setTurnStatus(TurnStatus.APPROVING);
         game.setTurnEndTime(null);
@@ -213,20 +214,37 @@ public class GameService {
 
     public void approveTurn(Long gameId, Set<String> guessedWords, Team playerTeam) {
         Game game = getGameById(gameId);
-        if(!TurnStatus.APPROVING.equals(game.getTurnStatus()) ||
+        if (!TurnStatus.APPROVING.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() != null) {
             throw new TurnException(String.format("Can't approve turn %d : %s, %s",
                     gameId, game.getTurnStatus(), game.getTurnEndTime()));
         }
         moveTeamTurn(game);
-        gameWordService.markAsGuessed(game, guessedWords, playerTeam);
+        markGuessedAndClearTurnWords(game, guessedWords, playerTeam);
         game.setTurnStatus(TurnStatus.NOT_STARTED);
         gameRepository.save(game);
+    }
+
+    private void markGuessedAndClearTurnWords(Game game, Set<String> guessedWords, Team team) {
+        game.getWords()
+                .forEach(word -> {
+                    if(guessedWords.contains(word.getWord().getString())) {
+                        word.setTeam(team);
+                    }
+                    word.setCurrentTurnGuessed(null);
+                });
     }
 
     public void clearWatchers(Long id) {
         Game game = getGameById(id);
         game.getWatchers().clear();
+        gameRepository.save(game);
+    }
+
+    public void setAllowSkipWords(Player player, Long gameId, boolean value) {
+        Game game = getGameById(gameId);
+        validateGameOwner(player, game, "Only game owner can change game properties");
+        game.setAllowSkipWords(value);
         gameRepository.save(game);
     }
 }

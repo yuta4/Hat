@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn", "turnStatus", "turnEndTime", "pausedTimeRemains"})
+@ToString(of = {"id", "owner", "isActive", "gameProgress", "teams", "watchers", "teamTurn", "allowSkipWords", "turnStatus", "turnEndTime", "pausedTimeRemains"})
 @EqualsAndHashCode(of = {"id"})
 public class Game {
 
@@ -74,6 +74,9 @@ public class Game {
     @CollectionTable(name = "game_words_level")
     @Column(name = "words_level")
     private Set<Level> wordsLevels = new HashSet<>();
+
+    @Column(nullable = false)
+    private boolean allowSkipWords = false;
 
     @Enumerated(EnumType.STRING)
     private TurnStatus turnStatus = TurnStatus.NOT_STARTED;

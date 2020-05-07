@@ -47,4 +47,12 @@ public class WordsController {
         gameService.setWordsPerPlayer(player, gameId, value);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/skip")
+    public ResponseEntity<Void> setAllowSkipWords(Principal principal, @RequestParam Long gameId,
+                                                  @RequestParam boolean value) {
+        Player player = playerService.getPlayerByLogin(principal.getName());
+        gameService.setAllowSkipWords(player, gameId, value);
+        return ResponseEntity.ok().build();
+    }
 }

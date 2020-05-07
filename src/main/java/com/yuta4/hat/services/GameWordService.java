@@ -49,20 +49,6 @@ public class GameWordService {
                 .collect(Collectors.toSet());
     }
 
-    @Transactional
-    public void markAsGuessed(Game game, Set<String> strings, Team team) {
-        gameWordRepository.clearCurrentTurnWords(team.getGame());
-        strings.stream()
-                .map(str -> gameWordRepository.findByGameAndWord(game,
-                        wordRepository.findByString(str)
-                                .orElseThrow(() -> new WordException("Can't find word by string " + str)))
-                        .orElseThrow(() -> new WordException(String.format("Can't find word %s in this game", str))))
-                .forEach(gameWord -> {
-                    gameWord.setTeam(team);
-//                    gameWordRepository.save(gameWord);
-                });
-    }
-
     public boolean markTurnWordAndCheckIfRoundCompleted(Game game, Team team, String word, boolean isGuessed) {
         GameWord gameWord = gameWordRepository.findByGameAndWord(game,
                 wordRepository.findByString(word)

@@ -20,7 +20,7 @@ public class TeamConverterUtil {
                                     .map(Player::getLogin)
                                     .collect(Collectors.toCollection(LinkedHashSet::new));
                             String teamName = getTeamName(team);
-                            Short teamScore = team.getScore() == null ? 0 : team.getScore();
+                            Long teamScore = team.getScore() == null ? 0 : team.getScore();
                             return new TeamDto(team.getId(), teamName, teamPlayers, teamScore);
                         })
                         .collect(Collectors.toCollection(LinkedHashSet::new));

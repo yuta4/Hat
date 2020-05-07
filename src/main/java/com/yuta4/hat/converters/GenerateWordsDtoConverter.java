@@ -30,7 +30,8 @@ public class GenerateWordsDtoConverter implements Converter<Game, GenerateWordsS
                 game.getWordsPerPlayer(),
                 game.getTeams().stream()
                         .map(team -> team.getPlayers().size())
-                        .reduce(0, Integer::sum) * game.getWordsPerPlayer()
+                        .reduce(0, Integer::sum) * game.getWordsPerPlayer(),
+                game.isAllowSkipWords()
         );
     }
 

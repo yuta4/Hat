@@ -91,7 +91,7 @@ public class TurnController {
         Team team = teamService.getTeamOrThrow(teamId);
         validatePlayer(player, game, team);
         if (gameWordService.markTurnWordAndCheckIfRoundCompleted(game, team, word, isGuessed)) {
-            gameService.finishTurn(gameId);
+            gameService.finishTurn(gameId, true);
             return ResponseEntity.ok(
                     gameWordService.getCurrentTurnWords(gameId));
         }
@@ -103,7 +103,7 @@ public class TurnController {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         validatePlayer(player, game);
-        gameService.finishTurn(gameId);
+        gameService.finishTurn(gameId, false);
         return ResponseEntity.ok(
                 Objects.requireNonNull(
                         turnWordsDtoConverter.convert(
@@ -120,6 +120,7 @@ public class TurnController {
         Team lastTeamTurn = game.getTeamTurn();
         gameService.approveTurn(gameId, guessedWords, team);
         teamService.movePlayerTurn(lastTeamTurn);
+        teamService.addScore(team.getId(), guessedWords.size());
         return ResponseEntity.ok().build();
     }
 

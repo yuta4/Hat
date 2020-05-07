@@ -19,6 +19,7 @@ const GenerateWords = (props) => {
     const [levels, setLevels] = useState(props.location.state.data.wordsLevels);
     const initialWordsPerPlayer = props.location.state.data.wordsPerPlayer;
     const [wordsPerPlayer, setWordsPerPlayer] = useState(initialWordsPerPlayer === null || initialWordsPerPlayer === undefined ? '' : initialWordsPerPlayer);
+    const [allowSkipWords, setAllowSkipWords] = useState(props.location.state.data.allowSkipWords);
     const [gameWords, setGameWords] = useState(props.location.state.data.gameWords);
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
@@ -32,6 +33,7 @@ const GenerateWords = (props) => {
         setLevels(eventJson.data.wordsLevels);
         setGameWords(eventJson.data.gameWords);
         setWordsPerPlayer(eventJson.data.wordsPerPlayer);
+        setAllowSkipWords(eventJson.data.allowSkipWords);
         setValidation(eventJson.validation);
     }
 
@@ -77,6 +79,16 @@ const GenerateWords = (props) => {
         });
     }
 
+    function onSkipWordsChange(event, data) {
+        console.log('GenerateWord onSkipWordsChange ' + data.checked);
+        client({
+            method: 'PUT',
+            path: '/words/skip?gameId=' + gid + '&value=' + data.checked
+        }).done(response => {
+            console.log('GenerateWord amount success');
+        });
+    }
+
     return (
         <div>
             <ScreenHeader iconName='unordered list' iconColor='orange'
@@ -105,6 +117,11 @@ const GenerateWords = (props) => {
                                            }}/>
                         )
                     }
+                </Form.Group>
+                <Form.Group grouped>
+                    <label>Rules</label>
+                    <Form.Checkbox disabled={!isOwner} checked={allowSkipWords} label='Allow skip words'
+                                   onChange={onSkipWordsChange}/>
                 </Form.Group>
                 <Form.Group>
                     {
