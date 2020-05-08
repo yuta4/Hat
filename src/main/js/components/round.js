@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Button, Divider, Form, Grid, Header, Icon, Label, Modal, Segment, Table} from 'semantic-ui-react'
-import {firstRound, summary} from '../screenNames';
+import {rounds, summary} from '../screenUIProps';
 import ScreenHeader from './screenHeader';
 import OwnerControls from './ownerControls';
 
 const client = require('../client');
 
 const Round = (props) => {
+
+    const [round, setRound] = useState(props.location.state.data.round);
+    const roundUI = rounds.get(round);
 
     const [owner, setOwner] = useState(props.location.state.data.owner);
     const [allowSkipWords, setAllowSkipWords] = useState(props.location.state.data.allowSkipWords);
@@ -161,7 +164,7 @@ const Round = (props) => {
         setWordsForApprovement([...toChange]);
     }
 
-    function renderModal() {
+    function renderApprovementModal() {
         const wordsPresent = wordsForApprovement !== undefined &&
             wordsForApprovement.length !== 0;
         return <Modal
@@ -226,13 +229,14 @@ const Round = (props) => {
                     }} icon='close' color='red'/>
                 </Grid.Column>
             }
-            <Grid.Column width={9}>
+            <Grid.Column width={8}>
                 <Button basic fluid>{lastNotGuessedWord}</Button>
             </Grid.Column>
-            <Grid.Column width={3}>
+            <Grid.Column width={4}>
                 <Button onClick={() => {
                     markWord(lastNotGuessedWord, true)
-                }} icon='checkmark' color='green'>
+                }} icon labelPosition='right' color='green'>
+                    <Icon name='checkmark'/>
                     {turnGuessesCount}
                 </Button>
             </Grid.Column>
@@ -243,10 +247,9 @@ const Round = (props) => {
         <div>
             {
                 needApprovement &&
-                renderModal()
+                renderApprovementModal()
             }
-            <ScreenHeader iconName='battery one' iconColor='violet'
-                          headerName={firstRound} owner={owner} gid={gid}/>
+            <ScreenHeader ui={roundUI} owner={owner} gid={gid}/>
             <Divider/>
             <Grid celled columns={2}>
                 {

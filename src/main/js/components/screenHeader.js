@@ -4,9 +4,7 @@ import React from "react";
 
 const ScreenHeader = (props) => {
 
-    const iconName = props.iconName;
-    const iconColor = props.iconColor;
-    const headerName = props.headerName;
+    const ui = props.ui;
     const owner = props.owner;
     const gid = props.gid;
 
@@ -14,17 +12,23 @@ const ScreenHeader = (props) => {
         <Segment clearing secondary>
             <Login/>
             <Header as='h1' icon textAlign='center'>
-                <Icon name={iconName} color={iconColor} circular/>
-                <Header.Content>{headerName}</Header.Content>
+                <Icon name={ui.icon} color={ui.color} circular/>
+                <Header.Content>{ui.name}</Header.Content>
             </Header>
-            <Header as='h2' floated='right'>
-                {owner}
-                <Icon name='spy'/>
-            </Header>
-            <Header as='h2' floated='left'>
-                <Icon color={'blue'} name='game'/>
-                {gid}
-            </Header>
+            {
+                owner !== undefined &&
+                <Header as='h2' floated='right'>
+                    {owner}
+                    <Icon name='spy'/>
+                </Header>
+            }
+            {
+                gid !== undefined &&
+                <Header as='h2' floated='left'>
+                    <Icon color={'blue'} name='game'/>
+                    {gid}
+                </Header>
+            }
         </Segment>
     )
 };

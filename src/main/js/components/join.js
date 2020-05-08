@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions} from 'easy-peasy';
-import {Button, Header, Icon, Label, Menu, Segment} from 'semantic-ui-react';
-import Login from './login';
-import {join} from '../screenNames';
+import {Button, Label, Menu} from 'semantic-ui-react';
+import {join} from '../screenUIProps';
+import ScreenHeader from "./screenHeader";
 
 const JoinScreen = (props) => {
 
@@ -35,13 +35,7 @@ const JoinScreen = (props) => {
 
     return (
         <div>
-            <Segment clearing secondary>
-                <Login/>
-                <Header as='h1' icon textAlign='center'>
-                    <Icon name={'fork'} color={'pink'} circular/>
-                    <Header.Content>{join}</Header.Content>
-                </Header>
-            </Segment>
+            <ScreenHeader ui={join}/>
             <Button color='blue' onClick={() => toMain()}>To main menu</Button>
             <Menu fluid vertical>
             {gamesToJoin.map(game => (

@@ -23,7 +23,9 @@ ReactDOM.render(
             <Route exact path="/summary/:gid" component={Summary}/>
             <Route exact path="/teams/:gid" component={TeamFormation}/>
             <Route exact path="/words/:gid" component={GenerateWords}/>
-            <Route exact path="/first/:gid" component={Round}/>
+            <Route exact path="/round/1/:gid" component={Round}/>
+            <Route exact path="/round/2/:gid" component={Round}/>
+            <Route exact path="/round/3/:gid" component={Round}/>
             <Route exact path="/create" component={NewGame}/>
             <Route exact path="/join" component={JoinScreen}/>
         </BrowserRouter>

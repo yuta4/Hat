@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useStoreActions, useStoreState} from 'easy-peasy';
 import {Button, Divider, Dropdown, Header, Icon, Item, Label, List, Message} from 'semantic-ui-react'
-import {generatingWords, teamFormation} from '../screenNames';
+import {generatingWords, teamFormation} from '../screenUIProps';
 import ScreenHeader from './screenHeader';
 import OwnerControls from './ownerControls';
 
@@ -73,8 +73,7 @@ const TeamFormation = (props) => {
 
     return (
         <div>
-            <ScreenHeader iconName='users' iconColor='olive'
-                          headerName={teamFormation} owner={owner} gid={gid}/>
+            <ScreenHeader ui={teamFormation} owner={owner} gid={gid}/>
             {
                 isOwner &&
                 <Button inverted color='violet' onClick={createTeam}>

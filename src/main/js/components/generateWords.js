@@ -1,5 +1,5 @@
 import ScreenHeader from "./screenHeader";
-import {firstRound, generatingWords, teamFormation} from "../screenNames";
+import {rounds, generatingWords, teamFormation} from "../screenUIProps";
 import React, {useEffect, useState} from "react";
 import OwnerControls from "./ownerControls";
 import {useStoreActions, useStoreState} from "easy-peasy";
@@ -91,8 +91,7 @@ const GenerateWords = (props) => {
 
     return (
         <div>
-            <ScreenHeader iconName='unordered list' iconColor='orange'
-                          headerName={generatingWords} owner={owner} gid={gid}/>
+            <ScreenHeader ui={generatingWords} owner={owner} gid={gid}/>
 
             <Form>
                 <Form.Group grouped>
@@ -144,7 +143,7 @@ const GenerateWords = (props) => {
             </Form>
             {
                 isOwner &&
-                <OwnerControls validation={validation} nextScreen={firstRound}
+                <OwnerControls validation={validation} nextScreen={rounds.get(1)}
                                prevScreen={teamFormation} gid={gid}  history={props.history}/>
             }
         </div>

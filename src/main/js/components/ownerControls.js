@@ -1,4 +1,4 @@
-import {Button, Label, List, Segment} from "semantic-ui-react";
+import {Button, Icon, Label, List, Segment} from "semantic-ui-react";
 import React from "react";
 
 const client = require('../client');
@@ -44,12 +44,19 @@ const OwnerControls = (props) => {
                     <br/>
                     {
                         nextScreen !== undefined &&
-                        <Button disabled={!isValidationPassed} onClick={() => moveProgress(nextScreen)} color={"green"}
-                                floated={'right'}>{nextScreen}</Button>
+                        <Button disabled={!isValidationPassed} onClick={() => moveProgress(nextScreen.name)}
+                                icon labelPosition='right' color={nextScreen.color} floated={'right'}>
+                            <Icon name={nextScreen.icon}/>
+                            {nextScreen.name}
+                        </Button>
                     }
                     {
                         prevScreen !== undefined &&
-                        <Button onClick={() => moveProgress(prevScreen)} inverted color={"green"}>{prevScreen}</Button>
+                        <Button onClick={() => moveProgress(prevScreen.name)}
+                                icon labelPosition='left' color={prevScreen.color}>
+                            {prevScreen.name}
+                            <Icon name={prevScreen.icon}/>
+                        </Button>
                     }
                 </Segment>
             </List.Item>

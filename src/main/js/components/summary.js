@@ -1,10 +1,8 @@
 import ScreenHeader from "./screenHeader";
-import {summary} from "../screenNames";
-import React, {useEffect, useState} from "react";
+import {summary} from "../screenUIProps";
+import React, {useState} from "react";
 import {useStoreActions, useStoreState} from "easy-peasy";
 import {Button} from "semantic-ui-react";
-
-const client = require('../client');
 
 const Summary = (props) => {
 
@@ -14,8 +12,7 @@ const Summary = (props) => {
 
     return (
         <div>
-            <ScreenHeader iconName='table' iconColor='red'
-                          headerName={summary} owner={owner} gid={gid}/>
+            <ScreenHeader ui={summary} owner={owner} gid={gid}/>
             <Button onClick={() => {
                 moveToJoinGameOption(props.history)
             }}
