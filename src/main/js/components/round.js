@@ -24,9 +24,9 @@ const Round = (props) => {
     const login = useStoreState(state => state.login);
     const gid = useStoreState(state => state.gid);
 
-    const [lastNotGuessedWord, setLastNotGuessedWord] = useState();
+    const [currentGuessingWord, setCurrentGuessingWord] = useState();
     const [turnWords, setTurnWords] = useState();
-    const [wordsForApprovement, setWordsForApprovement] = useState();
+    const [wordsForApproving, setWordsForApproving] = useState();
 
     const addEventListener = useStoreActions(actions => actions.addEventListener);
     const removeEventListener = useStoreActions(actions => actions.removeEventListener);
@@ -35,20 +35,26 @@ const Round = (props) => {
 
     const isActiveTurn = turnStatus === 'ACTIVE';
     const isPausedTurn = turnStatus === 'PAUSED';
-    const isPlayerTurn = login === playerTurn;
-    const turnControlsEnabled = isPlayerTurn && turnStatus !== 'APPROVING';
+    const isApprovingTurn = turnStatus === 'APPROVING';
 
-    const needApprovement = isPlayerTurn && turnStatus === 'APPROVING';
-    if (needApprovement && wordsForApprovement === undefined) {
-        client({
-            method: 'GET',
-            path: '/turn/words/approvement?gameId=' + gid
-        }).done((response) => {
-            setWordsForApprovement(response.entity);
-            console.log('turn words ' + JSON.stringify(response.entity));
-        }, (response) => {
-            console.log('turn words exception');
-        });
+    const isPlayerTurn = login === playerTurn;
+    const turnControlsEnabled = isPlayerTurn && !isApprovingTurn;
+
+    const isPlayerActiveTurn = isPlayerTurn && isActiveTurn;
+    const needApproving = isPlayerTurn && isApprovingTurn;
+    const time = Date.now();
+    console.log(time + ' playerTurn = ' + playerTurn + ', turnStatus = ' + turnStatus + ' wordsForApproving = ' + wordsForApproving);
+
+    if (needApproving) {
+        if(wordsForApproving === undefined) {
+            requestApprovingWords();
+        }
+    } else if(wordsForApproving !== undefined) {
+        setWordsForApproving(undefined);
+    }
+
+    if(isPlayerActiveTurn && currentGuessingWord === undefined) {
+        requestAvailableWords();
     }
 
     function extractTime() {
@@ -65,9 +71,11 @@ const Round = (props) => {
         setOwner(eventJson.data.owner);
         setAllowSkipWords(eventJson.data.allowSkipWords);
         setTeams(eventJson.data.teams);
-        setTeamTurn(eventJson.data.teamTurn);
-        setPlayerTurn(eventJson.data.playerTurn);
+        console.log('setTurnStatus ' + eventJson.data.turnStatus);
         setTurnStatus(eventJson.data.turnStatus);
+        setTeamTurn(eventJson.data.teamTurn);
+        console.log('setPlayerTurn ' + eventJson.data.playerTurn);
+        setPlayerTurn(eventJson.data.playerTurn);
         setTurnGuessesCount(eventJson.data.turnGuessesCount);
         setTurnSecondsRemaining(eventJson.data.turnSecondsRemaining);
         setValidation(eventJson.validation);
@@ -98,17 +106,33 @@ const Round = (props) => {
                 }).done(() => {
                     console.log('turn finish');
                     setTurnWords(undefined);
-                    setLastNotGuessedWord(undefined);
+                    setCurrentGuessingWord(undefined);
                 });
             }
         }
     }, [isActiveTurn, turnSecondsRemaining]);
 
-    function setLastNotGuessedRandomly(words, force) {
-        if (force || lastNotGuessedWord === undefined) {
+    function setCurrentGuessingFromParamOrRandomly(words, currentGuessing, force) {
+        setTurnWords(words);
+        if(currentGuessing !== undefined) {
+            setCurrentGuessingWord(currentGuessing);
+            return currentGuessing;
+        } else if (force || currentGuessingWord === undefined) {
             const i = Math.floor(Math.random() * (words.length - 1));
-            setLastNotGuessedWord(words[i]);
+            setCurrentGuessingWord(words[i]);
+            return words[i];
         }
+    }
+
+    function sendCurrentGuessing(currentGuessing) {
+        client({
+            method: 'PUT',
+            path: '/turn/current?gameId=' + gid + '&currentGuessing=' + currentGuessing
+        }).done((response) => {
+            console.log('turn current');
+        }, (response) => {
+            console.log('turn current error');
+        });
     }
 
     function toggleTurnStatus() {
@@ -130,8 +154,13 @@ const Round = (props) => {
                     path: '/turn/start?gameId=' + gid + '&wasPaused=' + isPausedTurn
                 }).done((response) => {
                     console.log('turn/start, paused ' + isPausedTurn);
-                    setTurnWords(response.entity);
-                    setLastNotGuessedRandomly(response.entity, false);
+                    const turnWords = response.entity;
+                    const currentGuessing = setCurrentGuessingFromParamOrRandomly(turnWords.words,
+                        turnWords.currentGuessing !== null ? turnWords.currentGuessing : undefined,
+                        false);
+                    if(turnWords.currentGuessing === null) {
+                        sendCurrentGuessing(currentGuessing);
+                    }
                 }, (response) => {
                     console.log('turn/start error, paused' + isPausedTurn);
                 });
@@ -142,7 +171,7 @@ const Round = (props) => {
     }
 
     function approveTurnWords() {
-        const guessedWords = wordsForApprovement
+        const guessedWords = wordsForApproving
             .filter(word => word.isGuessed)
             .map(word => word.word);
         client({
@@ -154,21 +183,48 @@ const Round = (props) => {
         }, (response) => {
             console.log('turn/approve error');
         });
-        setWordsForApprovement(undefined);
+        setWordsForApproving(undefined);
+    }
+
+    function requestAvailableWords() {
+        client({
+            method: 'GET',
+            path: '/turn/words?gameId=' + gid
+        }).done((response) => {
+            console.log('turn/approve');
+            const turnWords = response.entity;
+            setCurrentGuessingFromParamOrRandomly(turnWords.words,
+                turnWords.currentGuessing !== null ? turnWords.currentGuessing : undefined,
+                false);
+        }, (response) => {
+            console.log('turn/approve error');
+        });
+    }
+
+    function requestApprovingWords() {
+        client({
+            method: 'GET',
+            path: '/turn/words/approving?gameId=' + gid
+        }).done((response) => {
+            console.log(time + ' turn words ' + JSON.stringify(response.entity));
+            setWordsForApproving(response.entity);
+        }, (response) => {
+            console.log(time + ' turn words exception');
+        })
     }
 
     function changeWordGuessedInApproveModal(word, checked) {
-        const toChange = wordsForApprovement;
+        const toChange = wordsForApproving;
         const indexOfWord = toChange.indexOf(word);
         toChange[indexOfWord].isGuessed = checked;
-        setWordsForApprovement([...toChange]);
+        setWordsForApproving([...toChange]);
     }
 
-    function renderApprovementModal() {
-        const wordsPresent = wordsForApprovement !== undefined &&
-            wordsForApprovement.length !== 0;
+    function renderApprovingModal() {
+        const wordsPresent = wordsForApproving !== undefined &&
+            wordsForApproving.length !== 0;
         return <Modal
-            open={needApprovement}
+            open={needApproving}
             onClose={approveTurnWords}
             basic
             size='small'
@@ -180,7 +236,7 @@ const Round = (props) => {
                     <Form inverted>
                         <Form.Group grouped>
                             {
-                                wordsForApprovement.map(word =>
+                                wordsForApproving.map(word =>
                                     <Form.Checkbox checked={word.isGuessed} label={word.word}
                                                    key={word.word}
                                                    onChange={(event, data) => {
@@ -205,18 +261,18 @@ const Round = (props) => {
     }
 
     function markWord(word, isGuessed) {
+        const words = turnWords.filter(w => w !== word);
+        const currentGuessing = setCurrentGuessingFromParamOrRandomly(words, undefined, true);
         client({
             method: 'PUT',
             path: '/turn/mark?gameId=' + gid + '&teamId=' + teamTurn
                 + '&word=' + word + '&isGuessed=' + isGuessed
+                + (currentGuessing !== undefined ? '&currentGuessing=' + currentGuessing : '')
         }).done((response) => {
             console.log('turn/markWord');
         }, (response) => {
             console.log('turn/markWord error');
         });
-        const words = turnWords.filter(w => w !== word);
-        setTurnWords(words);
-        setLastNotGuessedRandomly(words, true);
     }
 
     function renderWordToGuess() {
@@ -225,16 +281,16 @@ const Round = (props) => {
                 allowSkipWords &&
                 <Grid.Column width={3}>
                     <Button onClick={() => {
-                        markWord(lastNotGuessedWord, false)
+                        markWord(currentGuessingWord, false)
                     }} icon='close' color='red'/>
                 </Grid.Column>
             }
             <Grid.Column width={8}>
-                <Button basic fluid>{lastNotGuessedWord}</Button>
+                <Button basic fluid>{currentGuessingWord}</Button>
             </Grid.Column>
             <Grid.Column width={4}>
                 <Button onClick={() => {
-                    markWord(lastNotGuessedWord, true)
+                    markWord(currentGuessingWord, true)
                 }} icon labelPosition='right' color='green'>
                     <Icon name='checkmark'/>
                     {turnGuessesCount}
@@ -246,8 +302,8 @@ const Round = (props) => {
     return (
         <div>
             {
-                needApprovement &&
-                renderApprovementModal()
+                needApproving &&
+                renderApprovingModal()
             }
             <ScreenHeader ui={roundUI} owner={owner} gid={gid}/>
             <Divider/>
@@ -264,11 +320,11 @@ const Round = (props) => {
                                         </Header>
                                         <Divider hidden/>
                                         {
-                                            (isPlayerTurn && isActiveTurn) &&
+                                            (isPlayerActiveTurn) &&
                                             renderWordToGuess()
                                         }
                                         {
-                                            !(isPlayerTurn && isActiveTurn) &&
+                                            !(isPlayerActiveTurn) &&
                                             <Button basic fluid>{turnGuessesCount}</Button>
                                         }
                                         <Divider hidden/>

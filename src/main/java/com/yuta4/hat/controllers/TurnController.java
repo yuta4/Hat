@@ -1,6 +1,7 @@
 package com.yuta4.hat.controllers;
 
-import com.yuta4.hat.dto.TurnWordDto;
+import com.yuta4.hat.dto.TurnApprovingWordDto;
+import com.yuta4.hat.dto.TurnAvailableWordsDto;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Player;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -30,21 +30,22 @@ public class TurnController {
     private GameWordService gameWordService;
     private TeamService teamService;
     private GameService gameService;
-    private Converter<List<GameWord>, Set<TurnWordDto>> turnWordsDtoConverter;
+    private Converter<List<GameWord>, Set<TurnApprovingWordDto>> turnApprovingWordsDtoConverter;
+    private Converter<Game, TurnAvailableWordsDto> turnAvailableWordsDtoConverter;
 
     public TurnController(PlayerService playerService, GameWordService gameWordService, TeamService teamService,
-                          GameService gameService, Converter<List<GameWord>, Set<TurnWordDto>> turnWordsDtoConverter) {
+                          GameService gameService, Converter<List<GameWord>, Set<TurnApprovingWordDto>> turnApprovingWordsDtoConverter, Converter<Game, TurnAvailableWordsDto> turnAvailableWordsDtoConverter) {
         this.playerService = playerService;
         this.gameWordService = gameWordService;
         this.teamService = teamService;
         this.gameService = gameService;
-        this.turnWordsDtoConverter = turnWordsDtoConverter;
+        this.turnApprovingWordsDtoConverter = turnApprovingWordsDtoConverter;
+        this.turnAvailableWordsDtoConverter = turnAvailableWordsDtoConverter;
     }
 
     @PutMapping("/start")
-    public Set<String> startTurn(Principal principal, @RequestParam Long gameId,
-                                 @RequestParam(defaultValue = "true") boolean wordsRequested,
-                                 @RequestParam(defaultValue = "false") boolean wasPaused) {
+    public TurnAvailableWordsDto startTurn(Principal principal, @RequestParam Long gameId,
+                                           @RequestParam(defaultValue = "false") boolean wasPaused) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         validatePlayer(player, game);
@@ -53,7 +54,25 @@ public class TurnController {
         } else {
             gameService.startTurn(gameId);
         }
-        return wordsRequested ? gameWordService.getNotGuessedWords(game) : Collections.EMPTY_SET;
+        return turnAvailableWordsDtoConverter.convert(game);
+    }
+
+    @GetMapping("/words")
+    public TurnAvailableWordsDto getAvailableWords(Principal principal, @RequestParam Long gameId) {
+        Player player = playerService.getPlayerByLogin(principal.getName());
+        Game game = gameService.getGameById(gameId);
+        validatePlayer(player, game);
+        return turnAvailableWordsDtoConverter.convert(game);
+    }
+
+    @PutMapping("/current")
+    public ResponseEntity<Void> setCurrentGuessing(Principal principal, @RequestParam Long gameId,
+                                                    @RequestParam String currentGuessing) {
+        Player player = playerService.getPlayerByLogin(principal.getName());
+        Game game = gameService.getGameById(gameId);
+        validatePlayer(player, game);
+        gameService.setCurrentGuessing(game, currentGuessing);
+        return ResponseEntity.ok().build();
     }
 
     private void validatePlayer(Player player, Game game) {
@@ -84,29 +103,26 @@ public class TurnController {
     }
 
     @PutMapping("/mark")
-    public ResponseEntity<Object> markTurnWord(Principal principal, @RequestParam Long gameId, @RequestParam Long teamId,
-                                               @RequestParam String word, @RequestParam boolean isGuessed) {
+    public ResponseEntity<Void> markTurnWord(Principal principal, @RequestParam Long gameId, @RequestParam Long teamId,
+                                               @RequestParam String word, @RequestParam boolean isGuessed,
+                                             @RequestParam(required = false) String currentGuessing) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         Team team = teamService.getTeamOrThrow(teamId);
         validatePlayer(player, game, team);
-        if (gameWordService.markTurnWordAndCheckIfRoundCompleted(game, team, word, isGuessed)) {
-            gameService.finishTurn(gameId, true);
-            return ResponseEntity.ok(
-                    gameWordService.getCurrentTurnWords(gameId));
-        }
+        gameService.markTurnWordAndFinishIfWordsCompleted(game, team, word, isGuessed, currentGuessing);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/finish")
-    public ResponseEntity<Set<TurnWordDto>> finishTurn(Principal principal, @RequestParam Long gameId) {
+    public ResponseEntity<Set<TurnApprovingWordDto>> finishTurn(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         validatePlayer(player, game);
-        gameService.finishTurn(gameId, false);
+        gameService.finishTurn(game, false);
         return ResponseEntity.ok(
                 Objects.requireNonNull(
-                        turnWordsDtoConverter.convert(
+                        turnApprovingWordsDtoConverter.convert(
                                 gameWordService.getCurrentTurnWords(gameId))));
     }
 
@@ -124,14 +140,14 @@ public class TurnController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/words/approvement")
-    public ResponseEntity<Set<TurnWordDto>> getCurrentTurnWords(Principal principal, @RequestParam Long gameId) {
+    @GetMapping("/words/approving")
+    public ResponseEntity<Set<TurnApprovingWordDto>> getCurrentTurnWords(Principal principal, @RequestParam Long gameId) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.getGameById(gameId);
         validatePlayer(player, game);
         return ResponseEntity.ok(
                 Objects.requireNonNull(
-                        turnWordsDtoConverter.convert(
+                        turnApprovingWordsDtoConverter.convert(
                                 gameWordService.getCurrentTurnWords(gameId))));
     }
 

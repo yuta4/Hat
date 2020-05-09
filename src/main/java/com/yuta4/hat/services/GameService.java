@@ -5,12 +5,14 @@ import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
 import com.yuta4.hat.TurnStatus;
 import com.yuta4.hat.entities.Game;
+import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.events.NewGameEvent;
 import com.yuta4.hat.exceptions.GameNotFoundException;
 import com.yuta4.hat.exceptions.RequestValidationException;
 import com.yuta4.hat.exceptions.TurnException;
+import com.yuta4.hat.exceptions.WordException;
 import com.yuta4.hat.repositories.GameRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 public class GameService {
@@ -45,12 +50,11 @@ public class GameService {
     }
 
     public void finishGameIfPermitted(Game game, Player player) {
-        validateGameOwner(player, game, "Only game owner can finish the game");
-        game.setIsActive(false);
-        game.setGameProgress(GameProgress.SUMMERY_VIEW);
-        game.getWatchers().clear();
-        gameRepository.save(game);
-        newGamesListener.onApplicationEvent(new NewGameEvent(player));
+        if(changeGameProgress(player, game, GameProgress.SUMMERY_VIEW)) {
+            newGamesListener.onApplicationEvent(new NewGameEvent(player));
+        } else {
+            throw new RequestValidationException("Only game owner can finish the game");
+        }
     }
 
     public boolean changeGameProgress(Player player, Game game, GameProgress gameProgress) {
@@ -80,7 +84,6 @@ public class GameService {
             }
         }
         game.setTeamTurn(nextTeam);
-        gameRepository.save(game);
     }
 
     public Game getGameById(Long gameId) {
@@ -161,6 +164,36 @@ public class GameService {
         }
     }
 
+    public Set<String> getAvailableWords(Game game, boolean currentTurn) {
+        return game.getWords().stream()
+                .filter(gameWord -> gameWord.getTeam() == null)
+                .filter(gameWord -> !currentTurn ||
+                        gameWord.getCurrentTurnGuessed() == null)
+                .map(gameWord -> gameWord.getWord().getString())
+                .collect(Collectors.toSet());
+    }
+
+    //TODO: rename
+    public void markTurnWordAndFinishIfWordsCompleted(Game game, Team team, String word, boolean isGuessed,
+                                                      String currentGuessing) {
+        GameWord gameWord = findGameWord(game, word);
+        Optional.ofNullable(currentGuessing)
+                .map(str -> findGameWord(game, str))
+                .ifPresent(game::setTurnCurrentGuessing);
+        gameWord.setCurrentTurnGuessed(isGuessed);
+        gameRepository.save(game);
+        if(getAvailableWords(game, true).isEmpty()) {
+            finishTurn(game, true);
+        }
+    }
+
+    private GameWord findGameWord(Game game, String word) {
+        return game.getWords().stream()
+                .filter(gw -> gw.getWord().getString().equals(word))
+                .findFirst()
+                .orElseThrow(() -> new WordException(String.format("Can't find word %s in game %d", word, game.getId())));
+    }
+
     public void unPauseTurn(Long gameId) {
         Game game = getGameById(gameId);
         if (!TurnStatus.PAUSED.equals(game.getTurnStatus()) ||
@@ -198,14 +231,13 @@ public class GameService {
         gameRepository.save(game);
     }
 
-    public void finishTurn(Long gameId, boolean noWordsLeft) {
-        Game game = getGameById(gameId);
+    public void finishTurn(Game game, boolean noWordsLeft) {
         if (!TurnStatus.ACTIVE.equals(game.getTurnStatus()) ||
                 game.getTurnEndTime() == null ||
                 (!noWordsLeft &&
                         game.getTurnEndTime().minusSeconds(1).isAfter(LocalDateTime.now()))) {
             throw new TurnException(String.format("Can't finish turn %d : %s, %s, %s",
-                    gameId, game.getTurnStatus(), game.getTurnEndTime(), noWordsLeft));
+                    game.getId(), game.getTurnStatus(), game.getTurnEndTime(), noWordsLeft));
         }
         game.setTurnStatus(TurnStatus.APPROVING);
         game.setTurnEndTime(null);
@@ -220,19 +252,32 @@ public class GameService {
                     gameId, game.getTurnStatus(), game.getTurnEndTime()));
         }
         moveTeamTurn(game);
-        markGuessedAndClearTurnWords(game, guessedWords, playerTeam);
         game.setTurnStatus(TurnStatus.NOT_STARTED);
-        gameRepository.save(game);
+        if(markGuessedAndClearTurnWords(game, guessedWords, playerTeam)) {
+            changeGameProgress(game.getOwner(), game, game.getGameProgress().getNext());
+        } else {
+            gameRepository.save(game);
+        }
     }
 
-    private void markGuessedAndClearTurnWords(Game game, Set<String> guessedWords, Team team) {
+    /**
+     *
+     * @return true if all words are guessed
+     */
+    private boolean markGuessedAndClearTurnWords(Game game, Set<String> guessedWords, Team team) {
+        AtomicBoolean allGuessed = new AtomicBoolean(true);
         game.getWords()
                 .forEach(word -> {
                     if(guessedWords.contains(word.getWord().getString())) {
                         word.setTeam(team);
                     }
                     word.setCurrentTurnGuessed(null);
+                    if(word.getTeam() == null) {
+                        allGuessed.set(false);
+                    }
                 });
+        game.setTurnCurrentGuessing(null);
+        return allGuessed.get();
     }
 
     public void clearWatchers(Long id) {
@@ -245,6 +290,12 @@ public class GameService {
         Game game = getGameById(gameId);
         validateGameOwner(player, game, "Only game owner can change game properties");
         game.setAllowSkipWords(value);
+        gameRepository.save(game);
+    }
+
+    public void setCurrentGuessing(Game game, String currentGuessing) {
+        GameWord gameWord = findGameWord(game, currentGuessing);
+        game.setTurnCurrentGuessing(gameWord);
         gameRepository.save(game);
     }
 }

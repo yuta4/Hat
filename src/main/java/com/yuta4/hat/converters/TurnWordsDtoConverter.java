@@ -1,7 +1,9 @@
 package com.yuta4.hat.converters;
 
-import com.yuta4.hat.dto.TurnWordDto;
+import com.yuta4.hat.dto.TurnApprovingWordDto;
+import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.GameWord;
+import com.yuta4.hat.entities.Player;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +16,21 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class TurnWordsDtoConverter implements Converter<List<GameWord>, Set<TurnWordDto>> {
+public class TurnWordsDtoConverter implements Converter<List<GameWord>, Set<TurnApprovingWordDto>> {
 
     private final static Logger logger = LoggerFactory.getLogger(TurnWordsDtoConverter.class);
 
     @Override
-    public Set<TurnWordDto> convert(List<GameWord> gameWordsList) {
-        Set<TurnWordDto> collected = gameWordsList.stream()
-                .map(gameWord -> new TurnWordDto(gameWord.getWord().getString(),
+    public Set<TurnApprovingWordDto> convert(List<GameWord> gameWordsList) {
+        Set<TurnApprovingWordDto> collected = gameWordsList.stream()
+                .map(gameWord -> new TurnApprovingWordDto(gameWord.getWord().getString(),
                         gameWord.getCurrentTurnGuessed()))
                 .collect(Collectors.toSet());
-        logger.info("Turn words set : {}", collected);
+        Game forDebug = gameWordsList.stream().map(GameWord::getGame).findFirst().orElse(null);
+        Long id = forDebug != null ? forDebug.getId() : null;
+        Player turn = forDebug != null && forDebug.getTeamTurn() != null ?
+                forDebug.getTeamTurn().getPlayerTurn() : null;
+        logger.info("Turn words set {}, {} : {}", id, turn, collected);
         return collected;
     }
 }

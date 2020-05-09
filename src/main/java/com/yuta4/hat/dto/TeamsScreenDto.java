@@ -10,7 +10,9 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 public class TeamsScreenDto implements ScreenDto {
-    private Set<TeamDto> teams;
-    private String owner;
-    private Set<String> watchers;
+
+    private final Set<TeamDto> teams;
+    private final String owner;
+    private final Set<String> watchers;
+
 }

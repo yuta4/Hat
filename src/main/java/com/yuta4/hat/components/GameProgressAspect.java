@@ -1,7 +1,6 @@
 package com.yuta4.hat.components;
 
 import com.yuta4.hat.entities.Game;
-import com.yuta4.hat.entities.GameWord;
 import com.yuta4.hat.entities.Team;
 import com.yuta4.hat.events.GameProgressEvent;
 import org.aspectj.lang.JoinPoint;
@@ -31,8 +30,6 @@ public class GameProgressAspect {
             gameProgressListener.onApplicationEvent(new GameProgressEvent((Game) arg));
         } else if (arg instanceof Team) {
             gameProgressListener.onApplicationEvent(new GameProgressEvent(((Team) arg).getGame()));
-        } else if (arg instanceof GameWord) {
-            gameProgressListener.onApplicationEvent(new GameProgressEvent(((GameWord) arg).getGame()));
         }
     }
 }

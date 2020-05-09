@@ -9,7 +9,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class SummaryDto implements ScreenDto {
 
-    private String owner;
-    private Set<TeamDto> teams;
+    private final String owner;
+    private final Set<TeamDto> teams;
 
 }

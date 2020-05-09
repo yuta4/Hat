@@ -5,7 +5,7 @@ import com.yuta4.hat.Language;
 import com.yuta4.hat.Level;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Team;
-import com.yuta4.hat.services.GameWordService;
+import com.yuta4.hat.services.GameService;
 import com.yuta4.hat.services.TeamService;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +17,11 @@ import java.util.Set;
 public class GameProgressValidator {
 
     private TeamService teamService;
-    private GameWordService gameWordService;
+    private GameService gameService;
 
-    public GameProgressValidator(TeamService teamService, GameWordService gameWordService) {
+    public GameProgressValidator(TeamService teamService, GameService gameService) {
         this.teamService = teamService;
-        this.gameWordService = gameWordService;
+        this.gameService = gameService;
     }
 
     public String validateRequirements(Game game) {
@@ -79,7 +79,7 @@ public class GameProgressValidator {
         if(!game.getGameProgress().equals(GameProgress.THIRD_ROUND)) {
             return Optional.of("Not all rounds are finished");
         }
-        if(!gameWordService.getNotGuessedWords(game).isEmpty()) {
+        if(!gameService.getAvailableWords(game, false).isEmpty()) {
             return Optional.of("Not all words where guessed");
         }
         return Optional.empty();

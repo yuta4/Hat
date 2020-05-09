@@ -62,6 +62,12 @@ public enum GameProgress {
                 .orElseThrow();
     }
 
+    public GameProgress getNext() {
+        return this.ordinal() < GameProgress.values().length - 1
+                ? GameProgress.values()[this.ordinal() + 1]
+                : null;
+    }
+
     public void setProgressProcessor(Consumer<Game> progressProcessor) {
         this.progressProcessor = progressProcessor;
     }

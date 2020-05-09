@@ -11,11 +11,11 @@ import java.util.Set;
 @ToString
 public class GenerateWordsScreenDto implements ScreenDto {
 
-    private String owner;
-    private Set<StringCheckboxDto> wordsLevels;
-    private Set<StringCheckboxDto> wordsLanguages;
-    private Integer wordsPerPlayer;
-    private Integer gameWords;
-    private boolean allowSkipWords;
+    private final String owner;
+    private final Set<StringCheckboxDto> wordsLevels;
+    private final Set<StringCheckboxDto> wordsLanguages;
+    private final Integer wordsPerPlayer;
+    private final Integer gameWords;
+    private final boolean allowSkipWords;
 
 }

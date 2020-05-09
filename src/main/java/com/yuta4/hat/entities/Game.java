@@ -36,6 +36,9 @@ public class Game {
         }
     }
 
+    @OneToOne
+    private GameWord turnCurrentGuessing;
+
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("game")
     @OrderBy("id desc")

@@ -28,9 +28,15 @@ public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> 
         String playerTurn = teamTurn == null ? "team turn not set" :
                 teamTurn.getPlayerTurn() == null ? "player turn not set" :
                 teamTurn.getPlayerTurn().getLogin();
-        Duration turnTimeRemaining = game.getTurnEndTime() == null || game.getTurnEndTime().isBefore(LocalDateTime.now())
-                ? Duration.ofMinutes(1)
-                : Duration.between(LocalDateTime.now(), game.getTurnEndTime());
+        Duration turnTimeRemaining;
+        //TODO: remove after investigation
+        try {
+            turnTimeRemaining = game.getTurnEndTime() == null || game.getTurnEndTime().isBefore(LocalDateTime.now())
+                    ? Duration.ofMinutes(1)
+                    : Duration.between(LocalDateTime.now(), game.getTurnEndTime());
+        } catch (NullPointerException ex) {
+            turnTimeRemaining = Duration.ofMinutes(1);
+        }
         long turnGuessesCount = game.getWords().stream()
                 .filter(w -> Boolean.TRUE.equals(w.getCurrentTurnGuessed()))
                 .count();

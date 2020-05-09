@@ -13,6 +13,6 @@ public class JoinGameDto {
         login = game.getOwner().getLogin();
     }
 
-    private Long gameId;
-    private String login;
+    private final Long gameId;
+    private final String login;
 }

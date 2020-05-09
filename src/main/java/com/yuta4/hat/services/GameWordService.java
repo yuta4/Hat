@@ -42,24 +42,6 @@ public class GameWordService {
         gameRepository.save(game);
     }
 
-    public Set<String> getNotGuessedWords(Game game) {
-        return game.getWords().stream()
-                .filter(gameWord -> gameWord.getTeam() == null)
-                .map(gameWord -> gameWord.getWord().getString())
-                .collect(Collectors.toSet());
-    }
-
-    public boolean markTurnWordAndCheckIfRoundCompleted(Game game, Team team, String word, boolean isGuessed) {
-        GameWord gameWord = gameWordRepository.findByGameAndWord(game,
-                wordRepository.findByString(word)
-                        .orElseThrow(() -> new WordException("Can't find word by string " + word)))
-                .orElseThrow(() -> new WordException(String.format("Can't find word %s in this game", word)));
-        gameWord.setCurrentTurnGuessed(isGuessed);
-        gameWord.setTeam(team);
-        gameWordRepository.save(gameWord);
-        return getNotGuessedWords(game).isEmpty();
-    }
-
     public List<GameWord> getCurrentTurnWords(Long gameId) {
         return gameWordRepository.findByGameIdAndCurrentTurnGuessedIsNotNull(gameId);
     }

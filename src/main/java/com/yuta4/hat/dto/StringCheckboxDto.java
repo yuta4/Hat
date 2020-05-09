@@ -6,6 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class StringCheckboxDto {
-    private String name;
-    private boolean value;
+
+    private final String name;
+    private final boolean value;
+
 }

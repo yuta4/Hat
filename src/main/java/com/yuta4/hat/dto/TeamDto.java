@@ -10,8 +10,10 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 public class TeamDto {
-    private Long id;
-    private String name;
-    private Set<String> players;
-    private Long score;
+
+    private final Long id;
+    private final String name;
+    private final Set<String> players;
+    private final Long score;
+
 }
