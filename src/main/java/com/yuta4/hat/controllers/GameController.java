@@ -2,12 +2,14 @@ package com.yuta4.hat.controllers;
 
 import com.yuta4.hat.components.JoinGamePublisher;
 import com.yuta4.hat.dto.JoinGameDto;
+import com.yuta4.hat.dto.StartScreenDto;
 import com.yuta4.hat.entities.Game;
 import com.yuta4.hat.entities.Player;
 import com.yuta4.hat.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -25,20 +27,19 @@ public class GameController {
 
     private final GameService gameService;
     private final PlayerService playerService;
-    private final WordService wordService;
     private final TeamService teamService;
-    private final GameWordService gameWordService;
     private final Flux<ServerSentEvent<Set<JoinGameDto>>> joinGameFlux;
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+    private Converter<Player, StartScreenDto> startScreenDtoConverter;
 
-    public GameController(GameService gameService, PlayerService playerService, WordService wordService,
-                          TeamService teamService, GameWordService gameWordService, JoinGamePublisher joinGamePublisher) {
+    public GameController(GameService gameService, PlayerService playerService,
+                          TeamService teamService, JoinGamePublisher joinGamePublisher, Converter<Player,
+            StartScreenDto> startScreenDtoConverter) {
         this.gameService = gameService;
         this.playerService = playerService;
-        this.wordService = wordService;
         this.teamService = teamService;
-        this.gameWordService = gameWordService;
         this.joinGameFlux = Flux.create(joinGamePublisher).share();
+        this.startScreenDtoConverter = startScreenDtoConverter;
     }
 
     @GetMapping("login")
@@ -51,20 +52,14 @@ public class GameController {
     public ResponseEntity<Long> startGame(Principal principal) {
         Player player = playerService.getPlayerByLogin(principal.getName());
         Game game = gameService.createGame(player);
-//        gameService.closeAllGamesOwnedBy();
         playerService.setLastGame(player, game);
         return ResponseEntity.ok().body(game.getId());
     }
 
     @GetMapping
-    public ResponseEntity<Long> getActiveGame(Principal principal) {
+    public StartScreenDto getActiveGame(Principal principal) {
         Player player = playerService.getPlayerByLogin(principal.getName());
-        Game game = player.getLastGame();
-        if(game != null && !Boolean.FALSE.equals(game.getIsActive()) &&
-                (game.getOwner().equals(player) || teamService.getGamePlayers(game).contains(player))) {
-            return ResponseEntity.ok().body(game.getId());
-        }
-        return ResponseEntity.notFound().build();
+        return startScreenDtoConverter.convert(player);
     }
 
     @PutMapping("changeWatcher")

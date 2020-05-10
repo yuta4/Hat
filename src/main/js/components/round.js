@@ -213,11 +213,19 @@ const Round = (props) => {
         })
     }
 
-    function changeWordGuessedInApproveModal(word, checked) {
-        const toChange = wordsForApproving;
-        const indexOfWord = toChange.indexOf(word);
-        toChange[indexOfWord].isGuessed = checked;
-        setWordsForApproving([...toChange]);
+    function markWord(word, isGuessed) {
+        const words = turnWords.filter(w => w !== word);
+        const currentGuessing = setCurrentGuessingFromParamOrRandomly(words, undefined, true);
+        client({
+            method: 'PUT',
+            path: '/turn/mark?gameId=' + gid + '&teamId=' + teamTurn
+                + '&word=' + word + '&isGuessed=' + isGuessed
+                + (currentGuessing !== undefined ? '&currentGuessing=' + currentGuessing : '')
+        }).done((response) => {
+            console.log('turn/markWord');
+        }, (response) => {
+            console.log('turn/markWord error');
+        });
     }
 
     function renderApprovingModal() {
@@ -260,19 +268,11 @@ const Round = (props) => {
         </Modal>
     }
 
-    function markWord(word, isGuessed) {
-        const words = turnWords.filter(w => w !== word);
-        const currentGuessing = setCurrentGuessingFromParamOrRandomly(words, undefined, true);
-        client({
-            method: 'PUT',
-            path: '/turn/mark?gameId=' + gid + '&teamId=' + teamTurn
-                + '&word=' + word + '&isGuessed=' + isGuessed
-                + (currentGuessing !== undefined ? '&currentGuessing=' + currentGuessing : '')
-        }).done((response) => {
-            console.log('turn/markWord');
-        }, (response) => {
-            console.log('turn/markWord error');
-        });
+    function changeWordGuessedInApproveModal(word, checked) {
+        const toChange = wordsForApproving;
+        const indexOfWord = toChange.indexOf(word);
+        toChange[indexOfWord].isGuessed = checked;
+        setWordsForApproving([...toChange]);
     }
 
     function renderWordToGuess() {
@@ -297,6 +297,19 @@ const Round = (props) => {
                 </Button>
             </Grid.Column>
         </Grid>
+    }
+
+    function renderTurnControls() {
+        return <Button as='div' fluid labelPosition='right'>
+            <Button onClick={toggleTurnStatus}
+                    color={isActiveTurn ? 'red' : 'green'}
+                    icon>
+                <Icon name={isActiveTurn ? 'pause' : 'play'}/>
+            </Button>
+            <Label as='h3' color='blue' size='big' basic pointing='left'>
+                {timer}
+            </Label>
+        </Button>;
     }
 
     return (
@@ -325,21 +338,15 @@ const Round = (props) => {
                                         }
                                         {
                                             !(isPlayerActiveTurn) &&
-                                            <Button basic fluid>{turnGuessesCount}</Button>
+                                            <Button basic active icon color='green' labelPosition='right' fluid>
+                                                <Icon name='checkmark'/>
+                                                {turnGuessesCount}
+                                            </Button>
                                         }
                                         <Divider hidden/>
                                         {
                                             turnControlsEnabled &&
-                                            <Button as='div' fluid labelPosition='right'>
-                                                <Button onClick={toggleTurnStatus}
-                                                        color={isActiveTurn ? 'red' : 'green'}
-                                                        icon>
-                                                    <Icon name={isActiveTurn ? 'pause' : 'play'}/>
-                                                </Button>
-                                                <Label as='h3' color='blue' size='big' basic pointing='left'>
-                                                    {timer}
-                                                </Label>
-                                            </Button>
+                                            renderTurnControls()
                                         }
                                         {
                                             !turnControlsEnabled &&

@@ -85,5 +85,7 @@ public class Game {
     private TurnStatus turnStatus = TurnStatus.NOT_STARTED;
 
     private LocalDateTime turnEndTime;
+
+    //how much turn time remains when game is paused
     private Duration pausedTimeRemains;
 }

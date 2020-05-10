@@ -27,16 +27,8 @@ public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> 
         Team teamTurn = game.getTeamTurn();
         String playerTurn = teamTurn == null ? "team turn not set" :
                 teamTurn.getPlayerTurn() == null ? "player turn not set" :
-                teamTurn.getPlayerTurn().getLogin();
-        Duration turnTimeRemaining;
-        //TODO: remove after investigation
-        try {
-            turnTimeRemaining = game.getTurnEndTime() == null || game.getTurnEndTime().isBefore(LocalDateTime.now())
-                    ? Duration.ofMinutes(1)
-                    : Duration.between(LocalDateTime.now(), game.getTurnEndTime());
-        } catch (NullPointerException ex) {
-            turnTimeRemaining = Duration.ofMinutes(1);
-        }
+                        teamTurn.getPlayerTurn().getLogin();
+        Duration turnTimeRemaining = countDurationRemaining(game);
         long turnGuessesCount = game.getWords().stream()
                 .filter(w -> Boolean.TRUE.equals(w.getCurrentTurnGuessed()))
                 .count();
@@ -53,7 +45,28 @@ public class RoundScreenDtoConverter implements Converter<Game, RoundScreenDto> 
         );
     }
 
-
+    private Duration countDurationRemaining(Game game) {
+        //TODO: remove after investigation
+        Duration turnTimeRemaining;
+        switch (game.getTurnStatus()) {
+            case ACTIVE:
+                turnTimeRemaining = Duration.between(LocalDateTime.now(), game.getTurnEndTime());
+                if (turnTimeRemaining.isNegative()) {
+                    turnTimeRemaining = Duration.ofSeconds(0);
+                }
+                break;
+            case PAUSED:
+                turnTimeRemaining = game.getPausedTimeRemains();
+                break;
+            case APPROVING:
+                turnTimeRemaining = Duration.ZERO;
+                break;
+            case NOT_STARTED:
+            default:
+                turnTimeRemaining = Duration.ofMinutes(1);
+        }
+        return turnTimeRemaining;
+    }
 
 
 }

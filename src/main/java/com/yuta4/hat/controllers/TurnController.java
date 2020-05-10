@@ -110,7 +110,7 @@ public class TurnController {
         Game game = gameService.getGameById(gameId);
         Team team = teamService.getTeamOrThrow(teamId);
         validatePlayer(player, game, team);
-        gameService.markTurnWordAndFinishIfWordsCompleted(game, team, word, isGuessed, currentGuessing);
+        gameService.markTurnWordAndFinishIfWordsCompleted(game, word, isGuessed, currentGuessing);
         return ResponseEntity.ok().build();
     }
 

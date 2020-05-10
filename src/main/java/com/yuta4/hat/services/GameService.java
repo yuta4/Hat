@@ -174,8 +174,12 @@ public class GameService {
     }
 
     //TODO: rename
-    public void markTurnWordAndFinishIfWordsCompleted(Game game, Team team, String word, boolean isGuessed,
+    public void markTurnWordAndFinishIfWordsCompleted(Game game, String word, boolean isGuessed,
                                                       String currentGuessing) {
+        if(!TurnStatus.ACTIVE.equals(game.getTurnStatus())) {
+            throw new TurnException(
+                    String.format("Can't mark %s word as game %d is not active", word, game.getId()));
+        }
         GameWord gameWord = findGameWord(game, word);
         Optional.ofNullable(currentGuessing)
                 .map(str -> findGameWord(game, str))
