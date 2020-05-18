@@ -13,7 +13,8 @@ import javax.persistence.*;
 public class GameWord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "game_word_generator")
+    @SequenceGenerator(name="game_word_generator", sequenceName = "game_word_seq")
     private Long id;
 
     @ManyToOne

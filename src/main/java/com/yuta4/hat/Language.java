@@ -7,7 +7,8 @@ import java.util.stream.Stream;
 @Getter
 public enum Language {
     UKRAINIAN("Ukrainian"),
-    ENGLISH("English");
+    ENGLISH("English"),
+    RUSSIAN("Russian");
 
     private String displayName;
 

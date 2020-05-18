@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/game_db
+    username: postgres
+    password: password
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: false
+#    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+#      ddl-auto: update
+#    properties:
+#      javax.persistence.schema-generation.create-source: metadata
+#      javax.persistence.schema-generation.scripts.action: create
+#      javax.persistence.schema-generation.scripts.create-target: create_ddl.sql
+
+  flyway:
+    table: schema_version
+#    enabled: false
+    enabled: true

@@ -1,4 +1,6 @@
-file outline
-fork
-snapchat ghost
-https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhEE3HteqM0tlQUSGG_TFeGxhfe3NKG1EapZVomNDDYl5yVl3gQ&s
+heroku login
+docker build --build-arg profile=prod -t yuta4/hat-online .
+docker tag yuta4/hat-online registry.heroku.com/hat-online/web
+heroku container:login
+docker push registry.heroku.com/hat-online/web
+heroku container:release web

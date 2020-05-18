@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    table: schema_version
+    enabled: true
+server:
+  port: ${PORT:8080}

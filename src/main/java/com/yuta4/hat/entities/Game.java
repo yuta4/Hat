@@ -23,7 +23,8 @@ import java.util.Set;
 public class Game {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "game_generator")
+    @SequenceGenerator(name="game_generator", sequenceName = "game_seq")
     private Long id;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

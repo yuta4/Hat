@@ -16,7 +16,8 @@ import java.util.Set;
 public class Team {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team_generator")
+    @SequenceGenerator(name="team_generator", sequenceName = "team_seq")
     private Long id;
 
     private String name;

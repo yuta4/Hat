@@ -1,0 +1,41 @@
+version: '3'
+services:
+  hat:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        profile: staging
+    working_dir: /app
+    #    command: ./docker-auto-test.sh
+    depends_on:
+      - docker-postgres
+    ports:
+      - 8080:8080
+#    environment:
+#      - "SPRING_PROFILES_ACTIVE=staging"
+
+  docker-postgres:
+    image: postgres:11-alpine
+    restart: always
+    container_name: docker-postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: game_db
+    expose:
+      - '5432'
+#    healthcheck:
+#      #      test: "/usr/bin/mysql --user=root --password=root--execute \"SHOW DATABASES;\""
+#      #      interval: 2s
+#      #      timeout: 20s
+#      #      retrie s: 10
+#      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+#      timeout: 20s
+#      retries: 10
+    volumes:
+      - my-db:/var/lib/postgresql/data
+volumes:
+  my-db:

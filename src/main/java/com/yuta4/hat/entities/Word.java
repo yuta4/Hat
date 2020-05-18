@@ -13,7 +13,8 @@ import javax.persistence.*;
 public class Word {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_generator")
+    @SequenceGenerator(name="word_generator", sequenceName = "word_seq")
     private Long id;
 
     @Column(nullable = false)
